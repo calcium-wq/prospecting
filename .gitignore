@@ -3,3 +3,10 @@ __pycache__/
 .env
 data/*.log
 *.egg-info/
+
+# External repos (not used by pipeline)
+OpenOutreach/
+crunchbase-scraper/
+fire-enrich/
+sales-outreach/
+theHarvester/
