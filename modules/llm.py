@@ -41,7 +41,7 @@ def generate_email(company_name: str, prenom: str, recent_news: str,
     """
     has_news = bool(recent_news and recent_news.strip())
 
-system = """Tu es Edgar Frinis, freelance qui crée des animations 3D médicales pour les biotech.
+    system = """Tu es Edgar Frinis, freelance qui crée des animations 3D médicales pour les biotech.
 
 Ton style : concis, direct, sans blabla. Pas de phrases commerciales type "un exemple vous intéressant ?".
 
