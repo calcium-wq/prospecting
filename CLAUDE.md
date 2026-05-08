@@ -254,6 +254,34 @@ python3 scrape_pipeline.py   # Scrape et ajoute à leads.csv (dédupliqué)
 30 9 * * * cd /home/mbped/prospecting && /usr/bin/python3 ...run.py --followup >> .../followup.log 2>&1
 ```
 
+## Règles absolues emails (anti-erreurs)
+
+Ces erreurs sont interdites dans tous les emails générés (initial + relances) :
+
+1. **Fautes de grammaire** : toujours vérifier les conjugaisons avant génération.
+   - INTERDIT : "pour échange" — CORRECT : "pour échanger", "pour discuter"
+   - Vérifier les terminaisons infinitives avant de répondre
+
+2. **Emails génériques interdits** : chaque email DOIT contenir au moins une info spécifique
+   à la boîte (produit, stade clinique, technologie, molécule, levée récente).
+   - INTERDIT : "je comprends votre secteur" sans nada de spécifique
+   - INTERDIT : "je sais que les biotechs font face à..." sans rien de concret
+   - Chaque email doit mentionner un élément vérifiable sur la boîte cible
+
+3. **CTA condescendante interdite** :
+   - INTERDIT : "Avez-vous déjà envisagé" — sous-entend que le prospect n'y a pas pensé
+   - CORRECT : "Est-ce que ça vous serait utile" ou question similaire sans jugement
+
+4. **Question finale doit mener vers un call de 15 min** :
+   - INTERDIT : "N'hésitez pas à me répondre"
+   - INTERDIT : "Donnez-moi votre retour"
+   - INTERDIT : "Je reste disponible si vous voulez en parler"
+   - CORRECT : "Ça vous parlerait un échange de 15 min ?" ou formulation équivalente vers un call concret
+
+5. **Dans modules/llm.py** : ces 4 règles sont inscrites explicitement dans le system prompt
+   de `generate_email()`, `generate_followup_j3()`, `generate_followup_j7()`, `generate_followup_j14()`
+   sous la forme `RÈGLES ABSOLUES — INTERDIT :` en majuscules.
+
 ## Règles absolues
 
 - Ne jamais hardcoder de credentials — toujours lire depuis .env
