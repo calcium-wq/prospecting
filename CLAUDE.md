@@ -213,10 +213,10 @@ step_monitor_replies→ Vérifie Gmail IMAP, traite réponses, notifie Telegram
 | Bug | Fichier | Impact | Statut |
 |-----|---------|--------|--------|
 | `smtplib.SMTPRejectError` n'existe pas dans Python | `email_enricher.py:317` | L'enrichissement SMTP crash si l'exception est levée | À corriger : remplacer par `smtplib.SMTPSenderRefused` ou `Exception` générique |
-| Notion database introuvable | `notion_crm.py` | Pas de sync Notion | Vérifier que la DB est partagée avec l'intégration "Propects" — lancer `python3 setup_notion.py` |
 | `NameError: 'email' is not defined` au preview | `run.py` ligne ~259 | Les emails ne peuvent pas être pré-générés en bloc | À corriger : vérifier le parsing de l f-string dans log_error |
-| Templates relances hardcodés dans email_sender.py | `email_sender.py` | Les fonctions `_build_relance_j3/j7/j14` ne sont PLUS appelées par run.py mais le code reste là | Danger de confusion — à supprimer ou documenter comme legacy |
-| La limite email affichée dit 100/jour | `run.py:284` | Affiche 100, CLAUDE.md disait 50 | Limite réelle = 100 (config.py) — à jour |
+
+Les bugs Notion ont été résolus : `setup_notion.py` a créé les colonnes, la base "Leads Prospection" fonctionne.
+Les templates hardcodés de `email_sender.py` (`_build_relance_j3/j7/j14`) ne sont plus utilisés — `followup.py` appelle directement `llm.generate_followup_j3/j7/j14`.
 
 ## Fichier pivot : data/leads.csv
 
@@ -228,7 +228,7 @@ relance_j3, relance_j7, relance_j14,
 reponse, dnc, notes
 ```
 
-Tous les leads sont à "Nouveau" — aucune action encore envoyée.
+État actuel : 85 leads, 19 avec email, 66 sans email. Tous sont à "Nouveau" — aucune action encore envoyée.
 
 ## scrape_pipeline.py — Script autonome
 
