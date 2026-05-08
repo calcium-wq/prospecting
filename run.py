@@ -178,17 +178,14 @@ def _build_email_for_lead(lead: dict) -> dict:
 
     boite = lead.get("boite", "")
     corrected = _get_corrected_lead(lead)
-
-    if corrected.get("_use_bonjour_only"):
-        prenom_for_llm = "Bonjour"
-    else:
-        prenom_for_llm = corrected.get("prenom", "")
+    prenom = corrected.get("prenom", "")
+    use_generic = corrected.get("_use_bonjour_only", False)
 
     news = get_recent_news_for_company(boite, lead.get("domaine", ""))
 
     email_content = generate_email(
         company_name=boite,
-        prenom=prenom_for_llm,
+        prenom=prenom,
         recent_news=news,
         sector="biotech/medtech",
         stage="Seed/Series A"
@@ -196,12 +193,16 @@ def _build_email_for_lead(lead: dict) -> dict:
 
     body = email_content["body"]
 
-    if corrected.get("_use_bonjour_only"):
-        body = body.replace("Bonjour Bonjour,", "Bonjour,")
-        body = body.replace("Bonjour Cher(ère) Bonjour,", "Bonjour,")
-        body = body.replace("Bonjour Bonjour", "Bonjour")
-        for old in ["Bonjour [Prénom],", "Bonjour [Prénom] ,", "Bonjour [Prénom]", "Bonjour  [Prénom],"]:
-            body = body.replace(old, "Bonjour,")
+    # Supprimer toute salutation résiduelle que le LLM aurait pu générer malgré les instructions
+    for stray in [f"{prenom},", f"Bonjour {prenom},", f"Salut {prenom},",
+                  "Bonjour,", "Salut,", f"{prenom} ,"]:
+        if body.startswith(stray):
+            body = body[len(stray):].lstrip()
+            break
+
+    # Ajouter la salutation une seule fois, depuis le code
+    greeting = "Bonjour," if use_generic else f"{prenom},"
+    body = f"{greeting}\n\n{body}"
 
     return {
         "to": lead.get("email", ""),
@@ -240,17 +241,9 @@ def step_preview_emails() -> list[dict]:
             email_data = _build_email_for_lead(lead)
             _pending_emails.append(email_data)
 
-            corrected = _get_corrected_lead(lead)
-            if corrected.get("_use_bonjour_only"):
-                greeting = "Bonjour,"
-            else:
-                greeting = f"Bonjour {corrected.get('prenom', '')},"
-
             print(f"{'─'*60}")
             print(f"[{i}/{len(to_contact)}] {email_data['to']}")
             print(f"Objet : {email_data['subject']}")
-            print(f"Salutation : {greeting}")
-            print(f"Corps :")
             print(f"{'─'*60}")
             print(email_data["body"])
             print()
