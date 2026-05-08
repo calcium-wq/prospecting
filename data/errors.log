@@ -1,0 +1,36 @@
+[2026-05-08 13:18:39] [notion_crm] ensure_database_schema: APIResponseError: Could not find database with ID: 35aa6178-2315-806b-b511-c341e93e1234. Make sure the relevant pages and databases are shared with your integration "Propects".
+[2026-05-08 13:20:53] [notion_crm] ensure_database_schema: APIResponseError: Could not find database with ID: 35aa6178-2315-806b-b511-c341e93e1234. Make sure the relevant pages and databases are shared with your integration "Propects".
+[2026-05-08 16:43:35] [run.py] enrich cardiawave.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:43:48] [run.py] enrich cellprothera.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:44:01] [run.py] enrich corwave.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:44:44] [run.py] enrich everzom.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:45:25] [run.py] enrich hemerion.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:46:03] [run.py] enrich elixirhealth.fr: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:46:28] [run.py] enrich cilcare.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:46:53] [run.py] enrich treefrog-therapeutics.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:47:06] [run.py] enrich eligo-bioscience.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:47:20] [run.py] enrich enterome.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:47:32] [run.py] enrich aelis-farma.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:48:15] [run.py] enrich abivax.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:48:57] [run.py] enrich dnascript.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:49:10] [run.py] enrich ose-immuno.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:49:53] [run.py] enrich biophytis.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 16:50:05] [run.py] enrich alcediag.com: AttributeError: module 'smtplib' has no attribute 'SMTPRejectError'
+[2026-05-08 18:31:03] [notion_crm] find_page maurice.delplanque@cardiawave.com: AttributeError: 'DatabasesEndpoint' object has no attribute 'query'
+[2026-05-08 18:31:04] [notion_crm] find_page maurice.delplanque@cardiawave.com: AttributeError: 'DatabasesEndpoint' object has no attribute 'query'
+[2026-05-08 19:32:52] [run.py] preview maurice.delplanque@cardiawave.com: NameError: name 'email' is not defined
+[2026-05-08 19:32:53] [run.py] preview ofriedrich@cellprothera.com: NameError: name 'email' is not defined
+[2026-05-08 19:32:54] [run.py] preview robert.marnette@corwave.com: NameError: name 'email' is not defined
+[2026-05-08 19:32:55] [run.py] preview maxence.duchemin@everzom.com: NameError: name 'email' is not defined
+[2026-05-08 19:32:56] [run.py] preview cd@hemerion.com: NameError: name 'email' is not defined
+[2026-05-08 19:32:57] [run.py] preview contact@elixirhealth.fr: NameError: name 'email' is not defined
+[2026-05-08 19:32:58] [run.py] preview mathieu.schue@cilcare.com: NameError: name 'email' is not defined
+[2026-05-08 19:32:59] [run.py] preview contact@treefrog-therapeutics.com: NameError: name 'email' is not defined
+[2026-05-08 19:33:00] [run.py] preview aurelie.grienenberger@eligo-bioscience.com: NameError: name 'email' is not defined
+[2026-05-08 19:33:01] [run.py] preview prinaudo@enterome.com: NameError: name 'email' is not defined
+[2026-05-08 19:33:02] [run.py] preview contact@aelis-farma.com: NameError: name 'email' is not defined
+[2026-05-08 19:33:03] [run.py] preview adrien.kremer@abivax.com: NameError: name 'email' is not defined
+[2026-05-08 19:33:04] [run.py] preview gweltas.odye@dnascript.com: NameError: name 'email' is not defined
+[2026-05-08 19:33:05] [run.py] preview jean-jacques.mention@ose-immuno.com: NameError: name 'email' is not defined
+[2026-05-08 19:33:05] [run.py] preview pierre.dilda@biophytis.com: NameError: name 'email' is not defined
+[2026-05-08 19:33:06] [run.py] preview contact@alcediag.com: NameError: name 'email' is not defined
