@@ -47,18 +47,19 @@ Ton style : concis, direct, sans blabla. Pas de phrases commerciales type "un ex
 
 RÈGLES ABSOLUES — INTERDIT :
 - MAXIMUM 80 MOTS dans le corps (hors signature "— Edgar"). Compte les mots avant de répondre.
-- PAS de salutation en ouverture (pas de "Bonjour", "Salut", prénom seul, "Cher"). Commence directement par la phrase d'accroche.
-- JAMAIS "mon message vous est bien parvenu" (c'est daté)
-- JAMAIS "Je reste disponible" (cliché)
-- JAMAIS "Je ferme le dossier" (robotique)
-- JAMAIS de liste de cas d'usage ("levée ou congrès")
-- JAMAIS "Aurais-tu" (utiliser "Auriez-vous")
-- JAMAIS "Nom de l'entreprise" — remplacer par le vrai nom
-- JAMAIS "Nom de la molérence" — remplacer par le vrai nom du candidat médicament
-- JAMAIS faute de conjugaison : "pour échange" → INTERDIT. Toujours vérifier les terminaisons ("pour échanger", "pour discuter")
-- JAMAIS email générique : chaque email DOIT contenir au moins une info spécifique à la boîte (produit, stade clinique, technologie) — jamais de remplissage générique type "je comprends votre secteur"
-- JAMAIS CTA condescendant : INTERDIT "Avez-vous déjà envisagé" — cela sous-entend que le prospect n'y a pas pensé. Utiliser "Est-ce que ça vous serait utile" ou question similaire sans jugement
-- JAMAIS question de clotûre vague : la question finale DOIT mener vers un call de 15 min. Pas de "N'hésitez pas à me répondre" ou "Donnez-moi votre retour". FormatOK: "Ça vous parlerait un échange de 15 min ?"
+- INTERDIT salutation en ouverture ("Bonjour", "Salut", prénom seul, "Cher") — commence directement par la phrase d'accroche.
+- INTERDIT "mon message vous est bien parvenu" (daté)
+- INTERDIT "Je reste disponible" (cliché)
+- INTERDIT "Je ferme le dossier" (robotique)
+- INTERDIT liste de cas d'usage ("levée ou congrès")
+- INTERDIT "Aurais-tu" — utiliser "Auriez-vous"
+- INTERDIT "Nom de l'entreprise" — remplacer par le vrai nom
+- INTERDIT faute de conjugaison : "pour échange" → toujours "pour échanger", "pour discuter"
+- INTERDIT email générique : chaque email DOIT contenir au moins une info spécifique à la boîte (produit, stade clinique, technologie, molécule, levée)
+- INTERDIT CTA condescendante : "Avez-vous déjà envisagé" — sous-entend que le prospect n'y a pas pensé. CORRECT : "Est-ce que ça vous serait utile"
+- INTERDIT question finale vague : pas "N'hésitez pas à me répondre", pas "Donnez-moi votre retour". La question finale DOIT mener vers un call de 15 min. FormatOK : "Ça vous parlerait un échange de 15 min ?"
+- INTERDIT question ouverte descriptive en finale
+- INTERDIT signature autre que "— Edgar"
 - L'objet doit attirer la curiosité, pas décrire le service
 
 FORMAT :
@@ -75,16 +76,19 @@ Secteur: {sector}, stade: {stage}
 INFO 2026 DISPONIBLE:
 {recent_news}
 
-SPECIFIC KNOWLEDGE — à utiliser dans l'email si pertinent:
+SPECIFIC KNOWLEDGE — à utiliser dans l'email si pertinent (cite le produit/techno par son vrai nom) :
 - Cilcare: candidat médicament CIL001 (synaptopathie cochléaire, perte auditive cachée)
 - TreeFrog Therapeutics: biotech spécialisée en thérapie cellulaire par microcapsules
 - Abivax: biotech développant obefazimod pour rectocolite hémorragique
-- DNA Script: enzymologie synthétique, imprimantes ADN
+- DNA Script: enzymologie synthétique, imprimantes ADN SYNTAX
+- CorWave: pompe cardiaque LVAD à membrane ondulante biomimétique (inspirée du déplacement du poisson), en développement clinique pour insuffisance cardiaque avancée
+- Elixir Health: plateforme IA pour cliniques PMA (procréation médicalement assistée), gestion administrative et suivi patient fertilité
+- Alcediag: biomarqueurs RNA + IA pour psychiatrie de précision — test EDIT-B® pour différencier dépression unipolaire et trouble bipolaire via analyse sanguine
 
 Génère un email avec:
-- Une phrase de transition basique basée sur l'info (sans commentaire style "impressionnant")
+- Une phrase d'accroche basée sur l'info (sans commentaire style "impressionnant")
 - 1-2 phrases sur ce que tu fais (pas de "je crée des animations 3D de mécanismes d'action", plutôt "je fais des visuels 3D pour les biotech")
-- Close avec une question ouverte (pas de "un exemple vous intéressant")
+- Close : une CTA directe vers un call de 15 min (ex: "Ça vous parlerait un échange de 15 min ?")
 
 Objet: court et intrigant"""
     else:
@@ -93,11 +97,15 @@ Secteur: {sector}, stade: {stage}
 
 PAS D'INFO SUR LA BOÎTE.
 
+SPECIFIC KNOWLEDGE — utilise si la boîte correspond :
+- CorWave: pompe cardiaque LVAD à membrane ondulante biomimétique, développement clinique insuffisance cardiaque
+- Elixir Health: plateforme IA pour cliniques PMA (fertilité), gestion administrative + suivi patient
+- Alcediag: biomarqueurs RNA + IA, test EDIT-B® diagnostic dépression bipolaire vs unipolaire
+
 Génère un email:
-- Sans rien inventer
-- 1 phrase qui montre que tu comprends leur contexte ({stage} dans {sector})
+- Sans rien inventer — utilise les infos SPECIFIC KNOWLEDGE si disponibles, sinon reste sur le contexte ({stage} dans {sector})
 - Ce que tu fais en 1 phrase
-- Question directe
+- Close : CTA directe vers call 15 min
 
 Objet: court et intrigant"""
 

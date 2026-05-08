@@ -1,3 +1,12 @@
+# RÈGLES ABSOLUES — NE JAMAIS VIOLER
+# 1. Format : toujours MIMEText(body, 'plain') — jamais HTML
+# 2. Fautes de grammaire interdites — vérifier conjugaisons
+# 3. Chaque email DOIT contenir une info spécifique à la boîte
+# 4. CTA condescendante interdite ("Avez-vous déjà envisagé")
+# 5. Question finale = toujours vers un call 15min
+# 6. Signature toujours "— Edgar" jamais autre chose
+# 7. Jamais de question ouverte descriptive en finale
+
 """
 Envoi d'emails via Gmail SMTP + App Password.
 Gère initial + relances J+3/J+7/J+14.
