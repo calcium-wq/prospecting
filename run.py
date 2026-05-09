@@ -300,6 +300,17 @@ MANUAL_EMAIL_OVERRIDES: dict[str, dict[str, str]] = {'jhutin@steminov.com': {'su
  'lsabbagh@domaintherapeutics.com': {'subject': 'Vos GPCR en mouvement',
                                      'body': 'Domain Therapeutics avance sur des programmes GPCR en immuno-oncologie et inflammation, avec des mecanismes difficiles a vulgariser simplement. Je cree des animations 3D medicales pour rendre ces interactions receptorales claires dans un support investisseur ou partenaire.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'}}
 
+
+def _get_contactable_new_leads(df):
+    """Leads qui peuvent recevoir un premier email sans intervention humaine."""
+    return df[
+        (df["statut"] == "Nouveau") &
+        (df["email"] != "") &
+        (df["dnc"] == "") &
+        (~df["email"].apply(is_generic_email)) &
+        (~df["prenom"].fillna("").str.lower().isin(_BAD_PRENOM_VALUES))
+    ]
+
 def step_scrape(max_leads: int = 9999) -> list[dict]:
     """Étape 1 : Scrape les startups françaises biotech/medtech."""
     from modules.scraper import search_french_biotech_startups
@@ -465,13 +476,7 @@ def step_preview_emails() -> list[dict]:
     print("="*60)
 
     df = load_leads()
-    to_contact = df[
-        (df["statut"] == "Nouveau") &
-        (df["email"] != "") &
-        (df["dnc"] == "") &
-        (~df["email"].apply(is_generic_email)) &
-        (~df["prenom"].fillna("").str.lower().isin(_BAD_PRENOM_VALUES))
-    ]
+    to_contact = _get_contactable_new_leads(df)
 
     if to_contact.empty:
         print("[Preview] Aucun nouveau lead avec email à contacter")
@@ -507,6 +512,50 @@ def step_preview_emails() -> list[dict]:
     print(f"RÉSUMÉ : {len(_pending_emails)} emails prêts à être envoyés")
     print(f"{'='*60}")
     return _pending_emails
+
+
+def step_auto_send_safe():
+    """Mode non interactif pour GitHub Actions: preview + envoi des leads sûrs."""
+    global _pending_emails
+    _pending_emails = []
+
+    print("\n" + "="*60)
+    print("ÉTAPE 3B — AUTO SEND SAFE")
+    print("="*60)
+
+    df = load_leads()
+    to_contact = _get_contactable_new_leads(df)
+    remaining_quota = max(0, 100 - count_emails_sent_today())
+
+    if to_contact.empty:
+        print("[AutoSend] Aucun lead contactable")
+        return
+    if remaining_quota <= 0:
+        print("[AutoSend] Limite journalière déjà atteinte")
+        return
+
+    print(f"[AutoSend] {len(to_contact)} leads contactables, quota restant: {remaining_quota}")
+
+    for _, row in to_contact.head(remaining_quota).iterrows():
+        lead = row.to_dict()
+        try:
+            email_data = _build_email_for_lead(lead)
+            _pending_emails.append(email_data)
+            print(f"[AutoSend] READY {email_data['to']} | {email_data['subject']}")
+        except Exception as e:
+            log_error("run.py", e, f"auto_send_safe {lead.get('email', '')}")
+            print(f"[AutoSend] SKIP {lead.get('email', '')}: {e}")
+
+    if not _pending_emails:
+        print("[AutoSend] Aucun email valide généré")
+        return
+
+    PENDING_EMAILS_PATH.write_text(
+        json.dumps(_pending_emails, ensure_ascii=False, indent=2, default=str),
+        encoding="utf-8",
+    )
+    print(f"[AutoSend] {len(_pending_emails)} emails valides. Envoi automatique...")
+    step_send_emails(dry_run=False)
 
 
 def step_send_emails(dry_run: bool = False):
@@ -714,38 +763,60 @@ def step_linkedin():
         print(f"[LinkedIn] ERREUR : {e} — continuation...")
 
 
-def step_monitor_replies():
-    """Étape 6 : Vérification des réponses Gmail + résumé quotidien Telegram."""
-    from modules.gmail_monitor import check_replies, process_replies
-    from modules.telegram_notif import notify_hot_lead, send_daily_summary
+def _build_summary_stats() -> dict:
     from modules.leads_csv import load_leads
+    df = load_leads()
+    due_mask = (
+        ((df["statut"] == "Email envoyé") | (df["statut"] == "Relancé")) &
+        (df["dnc"].fillna("").astype(str).str.strip() == "") &
+        (df["reponse"].fillna("").astype(str).str.strip() == "") &
+        (
+            (df["relance_j3"] == date.today().isoformat()) |
+            (df["relance_j7"] == date.today().isoformat()) |
+            (df["relance_j14"] == date.today().isoformat())
+        )
+    )
+    return {
+        "sent": int((df["statut"] == "Email envoyé").sum()),
+        "replies": int(df["reponse"].fillna("").astype(str).str.strip().ne("").sum()),
+        "followups_due": int(due_mask.sum()),
+        "no_email": int((df["email"].fillna("") == "").sum()),
+        "hot": int((df["statut"] == "Intéressé").sum()),
+    }
+
+
+def step_daily_summary():
+    """Résumé quotidien Telegram sans relire Gmail."""
+    from modules.telegram_notif import send_daily_summary
+    print("\n" + "="*60)
+    print("ÉTAPE 6B — RÉSUMÉ QUOTIDIEN")
+    print("="*60)
+    try:
+        stats = _build_summary_stats()
+        send_daily_summary(stats)
+        print(f"[Summary] Envoyé : {stats}")
+    except Exception as e:
+        log_error("run.py", e, "step_daily_summary")
+        print(f"[Summary] ERREUR : {e}")
+
+
+def step_monitor_replies():
+    """Étape 6 : Vérification des réponses Gmail."""
+    from modules.gmail_monitor import check_replies, process_replies
+    from modules.telegram_notif import notify_hot_lead
     print("\n" + "="*60)
     print("ÉTAPE 6 — SURVEILLANCE RÉPONSES GMAIL")
     print("="*60)
-    hot_count = 0
     try:
         replies = check_replies()
         if not replies:
             print("[GmailMonitor] Aucune nouvelle réponse détectée")
         else:
             print(f"[GmailMonitor] {len(replies)} réponse(s) détectée(s)")
-            hot_count = process_replies(replies, notify_fn=notify_hot_lead) or 0
+            process_replies(replies, notify_fn=notify_hot_lead)
     except Exception as e:
         log_error("run.py", e, "step_monitor_replies")
         print(f"[GmailMonitor] ERREUR : {e} — continuation...")
-
-    try:
-        df = load_leads()
-        stats = {
-            "sent": int((df["statut"] == "Email envoyé").sum()),
-            "replies": int(df["reponse"].notna().sum()),
-            "followups_due": int((df["statut"] == "Relancé").sum()),
-            "no_email": int((df["email"].fillna("") == "").sum()),
-            "hot": hot_count,
-        }
-        send_daily_summary(stats)
-    except Exception as e:
-        log_error("run.py", e, "send_daily_summary")
 
 
 def test_all_components():
@@ -867,10 +938,12 @@ def main():
     parser.add_argument("--enrich", action="store_true", help="Enrichissement emails uniquement")
     parser.add_argument("--preview", action="store_true", help="Génère et affiche les emails pour validation")
     parser.add_argument("--send", action="store_true", help="Envoi emails (après --preview ou seul)")
+    parser.add_argument("--auto-send-safe", action="store_true", help="Envoi auto non interactif des leads sûrs")
     parser.add_argument("--followup", action="store_true", help="Relances uniquement")
     parser.add_argument("--followup-preview", action="store_true", help="Aperçu relances sans envoyer")
     parser.add_argument("--linkedin", action="store_true", help="LinkedIn uniquement")
     parser.add_argument("--monitor", action="store_true", help="Surveillance réponses Gmail")
+    parser.add_argument("--daily-summary", action="store_true", help="Envoie le résumé quotidien Telegram")
     parser.add_argument("--test", action="store_true", help="Test tous les composants")
     parser.add_argument("--max-leads", type=int, default=9999, help="Nombre max de leads à scraper")
     args = parser.parse_args()
@@ -896,6 +969,8 @@ def main():
         if not _pending_emails:
             step_preview_emails()
         _confirm_and_send()
+    elif args.auto_send_safe:
+        step_auto_send_safe()
     elif args.followup:
         step_followups()
     elif args.followup_preview:
@@ -904,6 +979,8 @@ def main():
         step_linkedin()
     elif args.monitor:
         step_monitor_replies()
+    elif args.daily_summary:
+        step_daily_summary()
     else:
         # Pipeline complet
         step_scrape(args.max_leads)

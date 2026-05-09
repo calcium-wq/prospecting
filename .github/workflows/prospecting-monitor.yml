@@ -1,0 +1,70 @@
+name: Prospecting Monitor
+
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prospecting-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Europe/Paris
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements-actions.txt
+
+      - name: Write .env
+        run: |
+          cat > .env <<'EOF'
+          OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL=${{ secrets.OPENROUTER_MODEL }}
+          GMAIL_ADDRESS=${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
+          LINKEDIN_EMAIL=${{ secrets.LINKEDIN_EMAIL }}
+          LINKEDIN_PASSWORD=${{ secrets.LINKEDIN_PASSWORD }}
+          HUNTER_API_KEY=${{ secrets.HUNTER_API_KEY }}
+          NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
+          TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}
+          TARGET_SECTOR=healthtech,medtech,biotech
+          TARGET_COUNTRY=France
+          TARGET_STAGE=seed,series_a
+          TARGET_ROLES=CMO,Head of Marketing,Founder,CEO
+          MY_SERVICE=3D medical animation delivered in 5 days for biotech fundraising and medical conferences
+          EOF
+
+      - name: Run monitor
+        run: python3 run.py --monitor
+
+      - name: Commit updated leads
+        run: |
+          if git diff --quiet -- data/leads.csv; then
+            echo "No leads.csv changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin master || true
+          git add data/leads.csv
+          git commit -m "chore: sync monitor updates"
+          git push origin HEAD:master

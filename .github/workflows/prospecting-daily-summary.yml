@@ -1,0 +1,55 @@
+name: Prospecting Daily Summary
+
+on:
+  schedule:
+    - cron: "15 20 * * 1-6"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prospecting-daily-summary
+  cancel-in-progress: false
+
+jobs:
+  daily-summary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Europe/Paris
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements-actions.txt
+
+      - name: Write .env
+        run: |
+          cat > .env <<'EOF'
+          OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL=${{ secrets.OPENROUTER_MODEL }}
+          GMAIL_ADDRESS=${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
+          LINKEDIN_EMAIL=${{ secrets.LINKEDIN_EMAIL }}
+          LINKEDIN_PASSWORD=${{ secrets.LINKEDIN_PASSWORD }}
+          HUNTER_API_KEY=${{ secrets.HUNTER_API_KEY }}
+          NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
+          TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}
+          TARGET_SECTOR=healthtech,medtech,biotech
+          TARGET_COUNTRY=France
+          TARGET_STAGE=seed,series_a
+          TARGET_ROLES=CMO,Head of Marketing,Founder,CEO
+          MY_SERVICE=3D medical animation delivered in 5 days for biotech fundraising and medical conferences
+          EOF
+
+      - name: Send daily summary
+        run: python3 run.py --daily-summary

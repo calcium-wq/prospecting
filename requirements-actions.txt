@@ -1,0 +1,6 @@
+python-dotenv
+openai
+pandas
+requests
+beautifulsoup4
+httpx

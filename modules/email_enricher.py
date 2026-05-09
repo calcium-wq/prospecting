@@ -9,6 +9,7 @@ Ordre de priorité :
 5. Vérification SMTP — ou fallback MX si WSL2 bloque tout
 """
 import re
+import shutil
 import socket
 import smtplib
 import subprocess
@@ -198,6 +199,9 @@ def _is_domain_email(email: str, domain: str) -> bool:
 def _run_harvester(domain: str) -> list[str]:
     if domain in _harvester_cache:
         return _harvester_cache[domain]
+    if shutil.which("theHarvester") is None:
+        _harvester_cache[domain] = []
+        return []
     try:
         result = subprocess.run(
             ["theHarvester", "-d", domain, "-b", "google,bing,duckduckgo", "-l", "50"],
