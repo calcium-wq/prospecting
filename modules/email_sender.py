@@ -9,7 +9,8 @@
 
 """
 Envoi d'emails via Gmail SMTP + App Password.
-Gère initial + relances J+3/J+7/J+14.
+Gère l'email initial uniquement. Les relances J+3/J+7/J+14
+sont gérées par modules/followup.py via le LLM (modules/llm.py).
 """
 import smtplib
 import time
@@ -54,33 +55,6 @@ Un exemple vous intéresse ?
 Edgar Frinis"""
     return subject, body
 
-def _build_relance_j3(prenom: str, boite: str) -> tuple[str, str]:
-    subject = f"Re: Animation 3D — {boite}"
-    body = f"""Bonjour {prenom}, mon message vous est bien parvenu ?
-
-Edgar"""
-    return subject, body
-
-def _build_relance_j7(prenom: str) -> tuple[str, str]:
-    subject = "Mécanisme d'action en 48h"
-    body = f"""Bonjour {prenom},
-
-Pour être concret : j'ai animé le MoA d'un anticorps monoclonal en 48h pour une startup en pré-Series A la semaine dernière.
-
-Utile pour votre prochain congrès ou pitch investisseur ?
-
-Edgar"""
-    return subject, body
-
-def _build_relance_j14(prenom: str) -> tuple[str, str]:
-    subject = "Je ferme le dossier"
-    body = f"""Bonjour {prenom},
-
-Dernier message — si le timing n'est pas bon, pas de problème. Je reste disponible.
-
-Edgar"""
-    return subject, body
-
 def send_initial_email(lead: dict, subject: str = "", body: str = "", hook: str = "") -> bool:
     """
     Send initial prospecting email. Returns True on success.
@@ -114,31 +88,4 @@ def send_initial_email(lead: dict, subject: str = "", body: str = "", hook: str 
         }
         update_lead(email, followup_dates)
         print(f"[EmailSender] Email initial envoyé à {email}")
-    return success
-
-def send_followup(lead: dict, day: int) -> bool:
-    """Send a follow-up email at J+3, J+7, or J+14."""
-    email = lead.get("email", "")
-    if not email:
-        return False
-
-    prenom = lead.get("prenom", "")
-    boite = lead.get("boite", "")
-
-    if day == 3:
-        subject, body = _build_relance_j3(prenom, boite)
-    elif day == 7:
-        subject, body = _build_relance_j7(prenom)
-    elif day == 14:
-        subject, body = _build_relance_j14(prenom)
-    else:
-        return False
-
-    success = _send_smtp(email, subject, body)
-    if success:
-        updates = {"statut": "Relancé"}
-        if day == 14:
-            updates["statut"] = "Froid"
-        update_lead(email, updates)
-        print(f"[EmailSender] Relance J+{day} envoyée à {email}")
     return success
