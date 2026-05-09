@@ -45,6 +45,15 @@ _EMAIL_RE = re.compile(r"[\w.+\-]+@[\w.\-]+\.[a-zA-Z]{2,}", re.IGNORECASE)
 _PLACEHOLDER_NAMES = {"fondateur", "founder", "ceo", "directeur", "contact",
                       "support", "admin", "noreply", "sales", "marketing", "service", "team"}
 
+_VOWELS = frozenset("aeiouyàâéèêëîïôùûü")
+# Clusters de consonnes valides en début de prénom français/anglais/nordique
+_VALID_NAME_DIGRAPHS = frozenset({
+    "bj", "bl", "br", "ch", "cl", "cr", "dr", "fl", "fr",
+    "gl", "gn", "gr", "ph", "pl", "pr", "qu", "sc", "sk",
+    "sl", "sm", "sn", "sp", "st", "sw", "th", "tr", "tw",
+    "vr", "wh", "wr",
+})
+
 
 def extract_prenom_from_email(email: str, fallback: str = "") -> str:
     """Extrait un prénom plausible depuis l'adresse email (prenom.nom@ ou prenom@)."""
@@ -66,6 +75,13 @@ def extract_prenom_from_email(email: str, fallback: str = "") -> str:
     if len(first) <= 1:
         return fallback
     if len(first) >= 8 and "." not in local:
+        return fallback
+    # Detect initial+surname without separator (e.g. jhutin=j+hutin, cmartin=c+martin)
+    if (len(first) >= 4
+            and "." not in local
+            and first[0] not in _VOWELS
+            and first[1] not in _VOWELS
+            and first[:2] not in _VALID_NAME_DIGRAPHS):
         return fallback
     return first.capitalize() if first else fallback
 

@@ -33,7 +33,15 @@ from modules.leads_csv import (
     get_leads_for_linkedin, count_emails_sent_today, count_linkedin_sent_this_month
 )
 
-_GENERIC_EMAIL_PREFIXES = {"contact", "hello", "info", "bonjour", "contact-us", "admin"}
+_GENERIC_EMAIL_PREFIXES = {
+    "contact", "hello", "info", "bonjour", "contact-us", "admin",
+    "support", "noreply", "no-reply", "sales", "marketing", "service",
+    "team", "equipe",
+}
+_BAD_PRENOM_VALUES = {
+    "fondateur", "founder", "contact", "support", "admin", "ceo",
+    "directeur", "hello", "marketing", "sales", "service", "team",
+}
 
 
 def is_generic_email(email: str) -> bool:
@@ -45,6 +53,7 @@ PRENOM_CORRECTIONS: dict[str, tuple[str, str]] = {
     "cd@hemerion.com":             ("Clement", "Dupont"),
     "prinaudo@enterome.com":       ("Philippe", "Rinaudo"),
     "ofriedrich@cellprothera.com": ("Olivier", "Friedrich"),
+    "jhutin@steminov.com":         ("Jean", "Hutin"),
 }
 
 NOTIFY_PRENOM = {}
@@ -127,7 +136,7 @@ def _get_corrected_lead(row: dict) -> dict:
 
     prenom = str(lead.get("prenom", "")).strip().lower()
 
-    is_generic = is_generic_email(email) or prenom in {"fondateur", "founder", "contact", "ceo", ""}
+    is_generic = is_generic_email(email) or prenom in _BAD_PRENOM_VALUES or prenom == ""
     lead["_use_bonjour_only"] = is_generic
 
     return lead
@@ -154,6 +163,34 @@ def _build_email_for_lead(lead: dict) -> dict:
     )
 
     body = email_content["body"]
+    subject = email_content["subject"]
+    import re as _re
+    body = _re.sub(r"(Est-ce que\s+)?[\u00c7\u00e7Cc]a vous parlerait un .change de 15 min\s*\?",
+                   "Est-ce qu'un \u00e9change de 15 min vous parlerait ?", body, flags=_re.IGNORECASE)
+    body = body.replace("\u00c7a vous parlerait un \u00e9change de 15 min ?", "Est-ce qu'un \u00e9change de 15 min vous parlerait ?")
+    body = body.replace("Est-ce que \u00e7a vous parlerait un \u00e9change de 15 min ?", "Est-ce qu'un \u00e9change de 15 min vous parlerait ?")
+    body = body.replace("Ca vous parlerait un echange de 15 min ?", "Est-ce qu'un echange de 15 min vous parlerait ?")
+    body = body.replace("Est-ce que ca vous parlerait un echange de 15 min ?", "Est-ce qu'un echange de 15 min vous parlerait ?")
+    body = body.replace("animations 3D chirurgicales et anatomiques", "animations 3D medicales et anatomiques")
+    body = body.replace("animations 3D chirurgicales", "animations 3D medicales")
+
+
+    raw = f"{subject}\n{body}".lower()
+    forbidden_fragments = [
+        "[", "]", "nom de la technologie", "nom de la mol",
+        "nom de l'entreprise", "cela vous parlerait un", "vous parlerait un",
+    ]
+    if not body.strip():
+        raise ValueError("Email LLM vide ou bloque par validation qualite")
+    raw_norm = raw.replace("\u2011", "-").replace("\u2013", "-").replace("\u2014", "-")
+    if ("edit-b" in raw_norm or "edit b" in raw_norm) and str(boite).strip().lower() != "alcediag":
+        raise ValueError(f"Contamination croisee detectee: EDIT-B pour {boite}")
+    if any(fragment in raw for fragment in forbidden_fragments):
+        raise ValueError(f"Email bloque par validation qualite: {subject}")
+    word_count = len(body.split())
+    if word_count > 85:
+        raise ValueError(f"Email trop long: {word_count} mots")
+
 
     # Supprimer toute salutation résiduelle que le LLM aurait pu générer malgré les instructions
     for stray in [f"{prenom},", f"Bonjour {prenom},", f"Salut {prenom},",
@@ -168,7 +205,7 @@ def _build_email_for_lead(lead: dict) -> dict:
 
     return {
         "to": lead.get("email", ""),
-        "subject": email_content["subject"],
+        "subject": subject,
         "body": body,
         "lead": corrected,
     }
@@ -188,7 +225,9 @@ def step_preview_emails() -> list[dict]:
     to_contact = df[
         (df["statut"] == "Nouveau") &
         (df["email"] != "") &
-        (df["dnc"] == "")
+        (df["dnc"] == "") &
+        (~df["email"].apply(is_generic_email)) &
+        (~df["prenom"].fillna("").str.lower().isin(_BAD_PRENOM_VALUES))
     ]
 
     if to_contact.empty:

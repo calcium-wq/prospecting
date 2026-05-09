@@ -5,6 +5,30 @@ from openai import OpenAI
 from modules.config import OPENROUTER_API_KEY, OPENROUTER_BASE_URL, OPENROUTER_MODEL
 from modules.logger import log_error
 
+# Connaissance spécifique par boîte — injectée uniquement pour la boîte cible
+_SPECIFIC_KNOWLEDGE: dict[str, str] = {
+    "Cilcare": "candidat médicament CIL001 (synaptopathie cochléaire, perte auditive cachée)",
+    "TreeFrog Therapeutics": "biotech spécialisée en thérapie cellulaire par microcapsules",
+    "Abivax": "biotech développant obefazimod pour rectocolite hémorragique",
+    "DNA Script": "enzymologie synthétique, imprimantes ADN SYNTAX",
+    "CorWave": "pompe cardiaque LVAD à membrane ondulante biomimétique, développement clinique insuffisance cardiaque",
+    "Elixir Health": "plateforme IA pour cliniques PMA (fertilité), gestion administrative + suivi patient",
+    "Alcediag": "biomarqueurs RNA + IA, test EDIT-B® — différencier dépression unipolaire et trouble bipolaire via analyse sanguine",
+    "Metafora Biosystems": "test EDIT-B® et biomarqueurs RNA pour psychiatrie de précision",
+    "Cardiawave": "ultrasons focalisés (HIFU) pour sténose aortique sans chirurgie",
+    "Hemerion": "photosensibilisants pour PDT (thérapie photodynamique) en oncologie",
+    "Egle Therapeutics": "immunothérapie Treg, cellules régulatrices pour maladies auto-immunes",
+    "Eligo Bioscience": "phages génétiquement modifiés ciblant le microbiome, antibiotiques de précision",
+    "Enterome": "microbiome intestinal, biomarqueurs et candidats médicaments inflammatoire/oncologie",
+    "Aelis Farma": "sigmoïdes endocannabinoïdes, GAS6 pour addiction et maladies psychiatriques",
+    "OSE Immunotherapeutics": "immunothérapie oncologie et maladies inflammatoires, Tedopi® NSCLC",
+    "Biophytis": "BIO101 pour muscle et insuffisance respiratoire (Sarcopénie, COVID-19 sévère)",
+    "Vect-Horus": "technologie VECTrans pour franchir la barrière hémato-encéphalique",
+    "Vaxinano": "nanoparticules lipidiques sans adjuvant pour vaccins muqueux",
+    "Theranexus": "co-administration neuronal/glial, THN102 pour narcolepsie",
+    "Brenus Pharma": "immunothérapie BRE001 cancer du pancréas",
+}
+
 _client = None
 
 def get_client() -> OpenAI:
@@ -40,6 +64,7 @@ def generate_email(company_name: str, prenom: str, recent_news: str,
     Retourne {"subject": str, "body": str}.
     """
     has_news = bool(recent_news and recent_news.strip())
+    company_knowledge = _SPECIFIC_KNOWLEDGE.get(company_name, "")
 
     system = """Tu es Edgar Frinis, freelance qui crée des animations 3D médicales pour les biotech.
 
@@ -58,6 +83,7 @@ RÈGLES ABSOLUES — INTERDIT :
 - INTERDIT email générique : chaque email DOIT contenir au moins une info spécifique à la boîte (produit, stade clinique, technologie, molécule, levée)
 - INTERDIT CTA condescendante : "Avez-vous déjà envisagé" — sous-entend que le prospect n'y a pas pensé. CORRECT : "Est-ce que ça vous serait utile"
 - INTERDIT question finale vague : pas "N'hésitez pas à me répondre", pas "Donnez-moi votre retour". La question finale DOIT mener vers un call de 15 min. FormatOK : "Ça vous parlerait un échange de 15 min ?"
+- INTERDIT deux questions ou deux CTA dans le même email. UNE SEULE question finale, toujours vers un appel de 15 min.
 - INTERDIT question ouverte descriptive en finale
 - INTERDIT signature autre que "— Edgar"
 - L'objet doit attirer la curiosité, pas décrire le service
@@ -69,43 +95,31 @@ Objet: [sujet court, 4-6 mots, intrigant]
 
 — Edgar"""
 
+    knowledge_block = f"\nINFO SUR LA BOÎTE : {company_knowledge}" if company_knowledge else ""
+
     if has_news:
         context = f"""Destinataire: {prenom} de {company_name}
 Secteur: {sector}, stade: {stage}
+{knowledge_block}
 
 INFO 2026 DISPONIBLE:
 {recent_news}
 
-SPECIFIC KNOWLEDGE — à utiliser dans l'email si pertinent (cite le produit/techno par son vrai nom) :
-- Cilcare: candidat médicament CIL001 (synaptopathie cochléaire, perte auditive cachée)
-- TreeFrog Therapeutics: biotech spécialisée en thérapie cellulaire par microcapsules
-- Abivax: biotech développant obefazimod pour rectocolite hémorragique
-- DNA Script: enzymologie synthétique, imprimantes ADN SYNTAX
-- CorWave: pompe cardiaque LVAD à membrane ondulante biomimétique (inspirée du déplacement du poisson), en développement clinique pour insuffisance cardiaque avancée
-- Elixir Health: plateforme IA pour cliniques PMA (procréation médicalement assistée), gestion administrative et suivi patient fertilité
-- Alcediag: biomarqueurs RNA + IA pour psychiatrie de précision — test EDIT-B® pour différencier dépression unipolaire et trouble bipolaire via analyse sanguine
-
 Génère un email avec:
-- Une phrase d'accroche basée sur l'info (sans commentaire style "impressionnant")
-- 1-2 phrases sur ce que tu fais (pas de "je crée des animations 3D de mécanismes d'action", plutôt "je fais des visuels 3D pour les biotech")
-- Close : une CTA directe vers un call de 15 min (ex: "Ça vous parlerait un échange de 15 min ?")
+- Une phrase d'accroche basée sur les infos ci-dessus (sans commentaire style "impressionnant")
+- 1-2 phrases sur ce que tu fais
+- Close : UNE SEULE CTA directe vers un call de 15 min (ex: "Ça vous parlerait un échange de 15 min ?")
 
 Objet: court et intrigant"""
     else:
         context = f"""Destinataire: {prenom} de {company_name}
 Secteur: {sector}, stade: {stage}
-
-PAS D'INFO SUR LA BOÎTE.
-
-SPECIFIC KNOWLEDGE — utilise si la boîte correspond :
-- CorWave: pompe cardiaque LVAD à membrane ondulante biomimétique, développement clinique insuffisance cardiaque
-- Elixir Health: plateforme IA pour cliniques PMA (fertilité), gestion administrative + suivi patient
-- Alcediag: biomarqueurs RNA + IA, test EDIT-B® diagnostic dépression bipolaire vs unipolaire
+{knowledge_block}
 
 Génère un email:
-- Sans rien inventer — utilise les infos SPECIFIC KNOWLEDGE si disponibles, sinon reste sur le contexte ({stage} dans {sector})
+- Utilise l'info ci-dessus si disponible, sinon reste sur le contexte ({stage} dans {sector})
 - Ce que tu fais en 1 phrase
-- Close : CTA directe vers call 15 min
+- Close : UNE SEULE CTA directe vers call 15 min
 
 Objet: court et intrigant"""
 
@@ -126,6 +140,17 @@ Objet: court et intrigant"""
 
     if not subject:
         subject = f"Visuel 3D pour {company_name} ?"
+
+    # Validation anti-contamination croisée
+    body_lower = body.lower()
+    for other, _ in _SPECIFIC_KNOWLEDGE.items():
+        if other == company_name:
+            continue
+        if other.lower() in body_lower:
+            log_error("llm", Exception(
+                f"Contamination : '{other}' dans email pour '{company_name}'"
+            ), "generate_email cross-contamination")
+            return {"subject": subject, "body": ""}
 
     return {"subject": subject, "body": body}
 
