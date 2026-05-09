@@ -306,14 +306,48 @@ MANUAL_EMAIL_OVERRIDES: dict[str, dict[str, str]] = {'jhutin@steminov.com': {'su
                                          "body": "Le parcours de Viaskin et de l'immunotherapie epicutanee repose sur un mecanisme tres visuel, utile a rendre clair pour investisseurs et partenaires. Je cree des animations 3D medicales qui rendent ce type d'approche plus immediate a comprendre.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar"}}
 
 
+def _rescore_all_leads(df, increment_hold: bool = False):
+    from modules.contact_scoring import rescore_dataframe
+    return rescore_dataframe(df, increment_hold=increment_hold, mutate_status=True)
+
+
+def _rescore_row_in_df(df, idx, increment_hold: bool = False):
+    from modules.contact_scoring import enrich_contact_fields
+    rescored = enrich_contact_fields(df.loc[idx].to_dict(), increment_hold=increment_hold, mutate_status=True)
+    for key, value in rescored.items():
+        if key not in df.columns:
+            df[key] = ""
+        df.loc[idx, key] = value
+
+
+def _status_key(value):
+    lowered = str(value or "").strip().lower()
+    return (
+        lowered
+        .replace("é", "e")
+        .replace("è", "e")
+        .replace("ê", "e")
+        .replace("à", "a")
+        .replace("ù", "u")
+        .replace("ï", "i")
+        .replace("î", "i")
+        .replace("ô", "o")
+        .replace("ç", "c")
+    )
+
+
+def _status_startswith(value, prefixes):
+    key = _status_key(value)
+    return any(key.startswith(prefix) for prefix in prefixes)
+
+
 def _get_contactable_new_leads(df):
     """Leads qui peuvent recevoir un premier email sans intervention humaine."""
+    blocked_prefixes = ("email envoy", "relanc", "interess", "int", "froid", "linkedin envoy", "dnc", "hors scope")
     return df[
-        (df["statut"] == "Nouveau") &
+        (df["contact_decision"] == "auto_send") &
         (df["email"] != "") &
-        (df["dnc"] == "") &
-        (~df["email"].apply(is_generic_email)) &
-        (~df["prenom"].fillna("").str.lower().isin(_BAD_PRENOM_VALUES))
+        (~df["statut"].apply(lambda value: _status_startswith(value, blocked_prefixes)))
     ]
 
 def step_scrape(max_leads: int = 9999) -> list[dict]:
@@ -337,20 +371,21 @@ def step_scrape(max_leads: int = 9999) -> list[dict]:
 
 
 def step_enrich():
-    """Étape 2 : Enrichissement emails."""
+    """Etape 2 : enrichissement emails."""
     from modules.email_enricher import enrich_lead, extract_prenom_from_email
     from modules.leads_csv import save_leads
     print("\n" + "="*60)
-    print("ÉTAPE 2 — ENRICHISSEMENT EMAILS + LINKEDIN")
+    print("ETAPE 2 - ENRICHISSEMENT EMAILS")
     print("="*60)
     try:
-        df = load_leads()
+        df = _rescore_all_leads(load_leads())
+        save_leads(df)
 
         to_enrich = df[df["email"] == ""]
         if to_enrich.empty:
             print("[Enricher] Aucun lead sans email")
         else:
-            print(f"[Enricher] {len(to_enrich)} leads à enrichir...")
+            print(f"[Enricher] {len(to_enrich)} leads a enrichir...")
             for idx, row in to_enrich.iterrows():
                 lead = row.to_dict()
                 try:
@@ -364,19 +399,20 @@ def step_enrich():
                         df.loc[idx, "email"] = found_email
                         if new_prenom and new_prenom != current_prenom:
                             df.loc[idx, "prenom"] = new_prenom
-                            print(f"[Enricher] {row.get('boite', '')} → {found_email} (prénom: {new_prenom})")
+                            print(f"[Enricher] {row.get('boite', '')} -> {found_email} (prenom: {new_prenom})")
                         else:
-                            print(f"[Enricher] {row.get('boite', '')} → {found_email}")
+                            print(f"[Enricher] {row.get('boite', '')} -> {found_email}")
+
+                        _rescore_row_in_df(df, idx, increment_hold=True)
                         save_leads(df)
                 except Exception as e:
                     log_error("run.py", e, f"enrich {row.get('domaine', '')}")
 
-        # LinkedIn scraping désactivé — 0 résultats en pratique, ralentit massivement le pipeline
-        # Réactiver quand linkedin_url sera disponible directement dans les leads scrappés
+        df = _rescore_all_leads(df)
         save_leads(df)
     except Exception as e:
         log_error("run.py", e, "step_enrich")
-        print(f"[Enricher] ERREUR : {e} — continuation...")
+        print(f"[Enricher] ERREUR : {e} - continuation...")
 
 
 def _get_corrected_lead(row: dict) -> dict:
@@ -493,23 +529,24 @@ def _build_email_for_lead(lead: dict) -> dict:
 
 
 def step_preview_emails() -> list[dict]:
-    """Génère et affiche les 16 emails pour validation avant envoi."""
+    """Genere et affiche les emails pour validation avant envoi."""
     global _pending_emails
     _pending_emails = []
 
-    from modules.scraper import get_recent_news_for_company
+    from modules.leads_csv import save_leads
     print("\n" + "="*60)
-    print("PRÉVIEW — GÉNÉRATION DES 16 EMAILS")
+    print("PREVIEW - GENERATION DES EMAILS")
     print("="*60)
 
-    df = load_leads()
+    df = _rescore_all_leads(load_leads())
+    save_leads(df)
     to_contact = _get_contactable_new_leads(df)
 
     if to_contact.empty:
-        print("[Preview] Aucun nouveau lead avec email à contacter")
+        print("[Preview] Aucun nouveau lead avec email a contacter")
         return []
 
-    print(f"[Preview] {len(to_contact)} leads à générer\n")
+    print(f"[Preview] {len(to_contact)} leads a generer\n")
 
     for i, (_, row) in enumerate(to_contact.iterrows(), 1):
         lead = row.to_dict()
@@ -517,18 +554,18 @@ def step_preview_emails() -> list[dict]:
             email_data = _build_email_for_lead(lead)
             _pending_emails.append(email_data)
 
-            print(f"{'─'*60}")
+            print('-' * 60)
             print(f"[{i}/{len(to_contact)}] {email_data['to']}")
             print(f"Objet : {email_data['subject']}")
-            print(f"{'─'*60}")
+            print('-' * 60)
             print(email_data["body"])
             print()
 
         except Exception as e:
             log_error("run.py", e, f"preview {lead.get('email', '')}")
-            print(f"[Preview] ERREUR pour {lead.get('email', '')} — {e}")
+            print(f"[Preview] ERREUR pour {lead.get('email', '')} - {e}")
 
-    print(f"{'='*60}")
+    print('=' * 60)
     if _pending_emails:
         PENDING_EMAILS_PATH.write_text(
             json.dumps(_pending_emails, ensure_ascii=False, indent=2, default=str),
@@ -536,21 +573,23 @@ def step_preview_emails() -> list[dict]:
         )
         print(f"[Preview] Emails sauvegardes pour validation : {PENDING_EMAILS_PATH}")
 
-    print(f"RÉSUMÉ : {len(_pending_emails)} emails prêts à être envoyés")
-    print(f"{'='*60}")
+    print(f"RESUME : {len(_pending_emails)} emails prets a etre envoyes")
+    print('=' * 60)
     return _pending_emails
 
 
 def step_auto_send_safe():
-    """Mode non interactif pour GitHub Actions: preview + envoi des leads sûrs."""
+    """Mode non interactif pour GitHub Actions: preview + envoi des leads surs."""
     global _pending_emails
     _pending_emails = []
 
-    print("\n" + "="*60)
-    print("ÉTAPE 3B — AUTO SEND SAFE")
-    print("="*60)
+    from modules.leads_csv import save_leads
+    print("\n" + "=" * 60)
+    print("ETAPE 3B - AUTO SEND SAFE")
+    print("=" * 60)
 
-    df = load_leads()
+    df = _rescore_all_leads(load_leads())
+    save_leads(df)
     to_contact = _get_contactable_new_leads(df)
     remaining_quota = max(0, 100 - count_emails_sent_today())
 
@@ -558,7 +597,7 @@ def step_auto_send_safe():
         print("[AutoSend] Aucun lead contactable")
         return
     if remaining_quota <= 0:
-        print("[AutoSend] Limite journalière déjà atteinte")
+        print("[AutoSend] Limite journaliere deja atteinte")
         return
 
     print(f"[AutoSend] {len(to_contact)} leads contactables, quota restant: {remaining_quota}")
@@ -574,7 +613,7 @@ def step_auto_send_safe():
             print(f"[AutoSend] SKIP {lead.get('email', '')}: {e}")
 
     if not _pending_emails:
-        print("[AutoSend] Aucun email valide généré")
+        print("[AutoSend] Aucun email valide genere")
         return
 
     PENDING_EMAILS_PATH.write_text(
