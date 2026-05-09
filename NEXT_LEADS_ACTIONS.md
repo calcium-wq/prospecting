@@ -170,6 +170,7 @@ Autres contacts identifiés (non utilisés) :
 | 2026-05-10 | Recherche 5 leads supplémentaires | POXEL + Lovaltech ajoutés (2/5) |
 | 2026-05-10 | Recherche 10 leads restants | Qubit + Caranx(Affluent) ajoutés (2/10) |
 | 2026-05-10 | Recherche top 5 priority | PDCline: e.halioua@pdc-line-pharma.com (CEO) ✓ |
+| 2026-05-10 | Résolution queue A verifier | POXEL → Email envoyé, Caranx → Email envoyé, Qubit → DNC |
 
 ### 🟡 RÉSULTATS RECHERCHE 10 LEADSSUPPLEMENTAIRES (2026-05-10)
 
