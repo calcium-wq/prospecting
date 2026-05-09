@@ -35,6 +35,12 @@ from modules.leads_csv import (
 
 _GENERIC_EMAIL_PREFIXES = {"contact", "hello", "info", "bonjour", "contact-us", "admin"}
 
+
+def is_generic_email(email: str) -> bool:
+    prefix = email.split("@")[0].lower()
+    return prefix in _GENERIC_EMAIL_PREFIXES
+
+
 PRENOM_CORRECTIONS: dict[str, tuple[str, str]] = {
     "cd@hemerion.com":             ("Clement", "Dupont"),
     "prinaudo@enterome.com":       ("Philippe", "Rinaudo"),
@@ -98,6 +104,7 @@ def step_enrich():
                             print(f"[Enricher] {row.get('boite', '')} → {found_email} (prénom: {new_prenom})")
                         else:
                             print(f"[Enricher] {row.get('boite', '')} → {found_email}")
+                        save_leads(df)
                 except Exception as e:
                     log_error("run.py", e, f"enrich {row.get('domaine', '')}")
 
@@ -113,10 +120,7 @@ def step_enrich():
             if not email:
                 continue
 
-            email_prefix = email.split("@")[0].lower()
-            is_generic = email_prefix in _GENERIC_EMAIL_PREFIXES or "contact@" in email
-
-            if is_generic:
+            if is_generic_email(email):
                 continue
 
             correction = PRENOM_CORRECTIONS.get(email)
@@ -159,13 +163,8 @@ def _get_corrected_lead(row: dict) -> dict:
         lead["nom"] = correction[1]
 
     prenom = str(lead.get("prenom", "")).strip().lower()
-    email_prefix = email.split("@")[0].lower() if "@" in email else ""
 
-    is_generic = (
-        email_prefix in _GENERIC_EMAIL_PREFIXES or
-        "contact@" in email or
-        prenom in {"fondateur", "founder", "contact", "ceo", ""}
-    )
+    is_generic = is_generic_email(email) or prenom in {"fondateur", "founder", "contact", "ceo", ""}
     lead["_use_bonjour_only"] = is_generic
 
     return lead

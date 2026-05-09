@@ -40,7 +40,8 @@ _PATTERNS = [
 ]
 
 _EMAIL_RE = re.compile(r"[\w.+\-]+@[\w.\-]+\.[a-zA-Z]{2,}", re.IGNORECASE)
-_PLACEHOLDER_NAMES = {"fondateur", "founder", "ceo", "directeur", "contact"}
+_PLACEHOLDER_NAMES = {"fondateur", "founder", "ceo", "directeur", "contact",
+                      "support", "admin", "noreply", "sales", "marketing", "service", "team"}
 
 
 def extract_prenom_from_email(email: str, fallback: str = "") -> str:
@@ -60,6 +61,10 @@ def extract_prenom_from_email(email: str, fallback: str = "") -> str:
     else:
         return fallback  # trop court (ex: cd@)
     first = _re.sub(r"[^a-z]", "", first)
+    if len(first) <= 1:
+        return fallback
+    if len(first) >= 8 and "." not in local:
+        return fallback
     return first.capitalize() if first else fallback
 
 
