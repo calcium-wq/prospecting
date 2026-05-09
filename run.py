@@ -62,6 +62,229 @@ NOTIFY_PRENOM = {}
 _pending_emails: list[dict] = []
 PENDING_EMAILS_PATH = DATA_DIR / "pending_emails.json"
 
+MANUAL_EMAIL_OVERRIDES: dict[str, dict[str, str]] = {'jhutin@steminov.com': {'subject': 'StemInov en image',
+                         'body': 'Vos travaux sur les cellules souches mesenchymateuses issues de la gelee de Wharton '
+                                 'demandent une explication claire pour des investisseurs. Je cree des animations 3D '
+                                 'medicales qui rendent visibles les mecanismes cellulaires complexes, sans jargon '
+                                 'inutile.\n'
+                                 '\n'
+                                 'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                 '\n'
+                                 '-- Edgar'},
+ 'nicolas.fournier@dessintey.com': {'subject': 'Votre IVS en mouvement',
+                                    'body': "Dessintey transforme la reeducation avec l'IVS, STIIMP et SRT. Ces "
+                                            'technologies sont fortes, mais leur logique neuromotrice reste difficile '
+                                            'a saisir en quelques slides. Je cree des animations 3D medicales pour '
+                                            'rendre ce type de mecanisme immediatement comprehensible.\n'
+                                            '\n'
+                                            'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                            '\n'
+                                            '-- Edgar'},
+ 'jamal.temsamani@vect-horus.com': {'subject': 'VECTrans en 3D',
+                                    'body': 'La technologie VECTrans a un enjeu visuel evident : faire comprendre le '
+                                            'franchissement de la barriere hemato-encephalique. Je cree des animations '
+                                            '3D medicales qui rendent ce type de mecanisme clair pour des '
+                                            'investisseurs ou partenaires scientifiques.\n'
+                                            '\n'
+                                            'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                            '\n'
+                                            '-- Edgar'},
+ 'angelo.scuotto@vaxinano.com': {'subject': 'Vos vaccins muqueux en image',
+                                 'body': 'Votre approche autour des nanoparticules lipidiques pour vaccins muqueux '
+                                         'gagne a etre vue, pas seulement decrite. Je cree des animations 3D medicales '
+                                         'pour transformer des mecanismes immunologiques complexes en supports courts, '
+                                         'precis et utiles en presentation.\n'
+                                         '\n'
+                                         'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                         '\n'
+                                         '-- Edgar'},
+ 'marie.sebille@theranexus.com': {'subject': 'Le THN102 en mouvement',
+                                  'body': "L'approche neuronal-glial de Theranexus demande une vraie pedagogie "
+                                          'visuelle. Je cree des animations 3D medicales qui rendent lisibles les '
+                                          'mecanismes cellulaires complexes, notamment quand il faut expliquer une '
+                                          'differenciation scientifique a des investisseurs.\n'
+                                          '\n'
+                                          'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                          '\n'
+                                          '-- Edgar'},
+ 'anais.david@nateosante.com': {'subject': "Rendre visible l'air traite",
+                                'body': "L'EOLIS Air Manager traite un sujet invisible par nature : qualite de l'air, "
+                                        'filtration, flux, particules. Je cree des animations 3D medicales et '
+                                        'techniques pour rendre ce fonctionnement tangible dans des supports '
+                                        'commerciaux ou investisseurs.\n'
+                                        '\n'
+                                        'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                        '\n'
+                                        '-- Edgar'},
+ 'eric.jague@affluentmedical.com': {'subject': 'Epygon en 3D',
+                                    'body': "Les dispositifs d'Affluent Medical comme Epygon ou Kalios reposent sur "
+                                            'des interactions anatomiques fines. Je cree des animations 3D medicales '
+                                            'pour rendre ces mecanismes immediatement comprehensibles aupres '
+                                            "d'investisseurs, chirurgiens ou partenaires.\n"
+                                            '\n'
+                                            'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                            '\n'
+                                            '-- Edgar'},
+ 'france.jean.garrec@biophta.com': {'subject': 'Vos micro-inserts en image',
+                                    'body': "Les micro-inserts ophtalmiques de Biophta ont besoin d'une explication "
+                                            'visuelle precise : diffusion, positionnement, liberation prolongee. Je '
+                                            'cree des animations 3D medicales qui transforment ce mecanisme en '
+                                            'demonstration claire et courte.\n'
+                                            '\n'
+                                            'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                            '\n'
+                                            '-- Edgar'},
+ 'brian.schwab@erytech.com': {'subject': 'ERYCAPS en mouvement',
+                              'body': "La plateforme ERYCAPS, avec l'encapsulation de substances actives dans les "
+                                      'globules rouges, devient tres visuelle quand elle est bien modelisee. Je cree '
+                                      'des animations 3D medicales pour rendre ce mecanisme cellulaire clair en '
+                                      'quelques secondes.\n'
+                                      '\n'
+                                      'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                      '\n'
+                                      '-- Edgar'},
+ 'boris.leveque@axomove.com': {'subject': 'La reeducation Axomove en 3D',
+                               'body': "Axomove rend la reeducation plus accessible, mais l'impact d'un protocole "
+                                       'therapeutique reste parfois abstrait pour des decideurs. Je cree des '
+                                       'animations 3D medicales pour visualiser mouvement, articulation et benefice '
+                                       'patient avec un rendu clair.\n'
+                                       '\n'
+                                       'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                       '\n'
+                                       '-- Edgar'},
+ 'steve@smartimmune.com': {'subject': 'ProTcell en image',
+                           'body': 'La plateforme ProTcell touche a une mecanique immunitaire difficile a vulgariser : '
+                                   'progeniteurs, lymphocytes T, restauration immunitaire. Je cree des animations 3D '
+                                   'medicales pour transformer cette science en support clair pour investisseurs et '
+                                   'partenaires.\n'
+                                   '\n'
+                                   'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                   '\n'
+                                   '-- Edgar'},
+ 'bjoern.gerold@theraclion.com': {'subject': 'SONOVEIN en mouvement',
+                                  'body': "SONOVEIN rend l'echotherapie non invasive tres concrete, mais l'action des "
+                                          'ultrasons focalises reste invisible sans visualisation. Je cree des '
+                                          'animations 3D medicales pour expliquer cette interaction tissu-dispositif '
+                                          'avec precision.\n'
+                                          '\n'
+                                          'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                          '\n'
+                                          '-- Edgar'},
+ 'celine.breda@xenothera.com': {'subject': 'Vos anticorps en 3D',
+                                'body': 'Les anticorps polyclonaux glyco-humanises de Xenothera demandent une '
+                                        'pedagogie claire pour etre compris vite hors cercle scientifique. Je cree des '
+                                        'animations 3D medicales qui rendent ces mecanismes biologiques lisibles pour '
+                                        'investisseurs, partenaires et cliniciens.\n'
+                                        '\n'
+                                        'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                        '\n'
+                                        '-- Edgar'},
+ 'romain.lucas@seabelife.com': {'subject': 'Vos inhibiteurs de necrose en image',
+                                'body': "Les travaux de SEABELIFE sur l'inhibition de la necrose cellulaire touchent a "
+                                        'des mecanismes difficiles a expliquer rapidement. Je cree des animations 3D '
+                                        'medicales pour visualiser ces interactions moleculaires et les rendre '
+                                        'comprehensibles en presentation.\n'
+                                        '\n'
+                                        'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                        '\n'
+                                        '-- Edgar'},
+ 'pauline@avatarmedical.ai': {'subject': 'Avatar Medical en image',
+                              'body': "Avatar Medical transforme deja l'imagerie medicale en experience 3D "
+                                      'exploitable. Je cree des animations medicales cinematiques pour montrer la '
+                                      "valeur d'une technologie complexe, avec un rendu clair pour investisseurs, "
+                                      'chirurgiens ou partenaires.\n'
+                                      '\n'
+                                      'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                      '\n'
+                                      '-- Edgar'},
+ 'pascal.sirvent@valbiotis.com': {'subject': 'TOTUM-63 en mouvement',
+                                  'body': 'Les actifs de Valbiotis, comme TOTUM-63, reposent sur des mecanismes '
+                                          'metaboliques qui gagnent a etre visualises. Je cree des animations 3D '
+                                          "medicales pour rendre ces modes d'action plus clairs dans des supports "
+                                          'investisseurs ou scientifiques.\n'
+                                          '\n'
+                                          'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                          '\n'
+                                          '-- Edgar'},
+ 'colin.mansfield@ab-science.com': {'subject': 'Le masitinib en image',
+                                    'body': "Le masitinib repose sur des mecanismes d'inhibition difficiles a "
+                                            'vulgariser sans support visuel. Je cree des animations 3D medicales pour '
+                                            'transformer cette interaction moleculaire en demonstration claire, utile '
+                                            'en pitch investisseur ou presentation scientifique.\n'
+                                            '\n'
+                                            'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                            '\n'
+                                            '-- Edgar'},
+ 'clemence.morillot@incepto-medical.com': {'subject': 'Vos algorithmes en image',
+                                           'body': "Incepto rend l'IA medicale plus accessible aux equipes de "
+                                                   'radiologie. Je cree des animations 3D medicales pour rendre '
+                                                   "visibles des flux d'analyse, algorithmes ou parcours diagnostics "
+                                                   'qui restent souvent abstraits dans un deck classique.\n'
+                                                   '\n'
+                                                   'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                                   '\n'
+                                                   '-- Edgar'},
+ 'mathieu@cardiologs.com': {'subject': "L'ECG augmente en 3D",
+                            'body': "L'analyse ECG par IA de Cardiologs est puissante, mais son fonctionnement reste "
+                                    'difficile a montrer simplement. Je cree des animations 3D medicales pour '
+                                    "transformer ce type d'analyse invisible en demonstration claire et memorable.\n"
+                                    '\n'
+                                    'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                    '\n'
+                                    '-- Edgar'},
+ 'frederic.dayan@exactcure.com': {'subject': 'Le jumeau numerique en image',
+                                  'body': 'ExactCure rend la reponse medicamenteuse plus personnalisee grace au jumeau '
+                                          'numerique. Je cree des animations 3D medicales pour rendre cette simulation '
+                                          "concrete et comprehensible aupres d'investisseurs ou partenaires sante.\n"
+                                          '\n'
+                                          'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                          '\n'
+                                          '-- Edgar'},
+ 'nathan.burnel-hauteville@implicity.com': {'subject': 'Implicity en image',
+                                            'body': "La telesurveillance cardiaque d'Implicity repose sur des signaux, "
+                                                    'alertes et algorithmes difficiles a visualiser dans un support '
+                                                    'classique. Je cree des animations 3D medicales pour rendre ce '
+                                                    'parcours clinique clair en quelques secondes.\n'
+                                                    '\n'
+                                                    'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                                    '\n'
+                                                    '-- Edgar'},
+ 'andy.karabajakian@owkin.com': {'subject': "L'IA d'Owkin en image",
+                                 'body': "Les modeles d'Owkin relient donnees medicales, biologie et decouverte "
+                                         'therapeutique. Je cree des animations 3D medicales pour rendre ces '
+                                         'mecanismes complexes plus visibles et plus convaincants dans des supports '
+                                         'investisseurs ou partenaires.\n'
+                                         '\n'
+                                         'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                         '\n'
+                                         '-- Edgar'},
+ 'david.armand@surgivisio.com': {'subject': 'Surgivisio en 3D',
+                                 'body': 'Le guidage 2D/3D de Surgivisio merite une demonstration visuelle aussi '
+                                         'precise que la technologie elle-meme. Je cree des animations 3D medicales '
+                                         'pour rendre la navigation chirurgicale et le geste assiste immediatement '
+                                         'comprehensibles.\n'
+                                         '\n'
+                                         'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                         '\n'
+                                         '-- Edgar'},
+ 'maria.iacono@wandercraft.eu': {'subject': 'Atalante en mouvement',
+                                 'body': "L'exosquelette Atalante parle immediatement quand on voit sa stabilisation "
+                                         'et sa biomecanique en action. Je cree des animations 3D medicales pour '
+                                         "rendre cette technologie robotique claire aupres d'investisseurs, centres de "
+                                         'soins ou partenaires.\n'
+                                         '\n'
+                                         'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                         '\n'
+                                         '-- Edgar'},
+ 'leila.farid@feetme.fr': {'subject': 'FeetMe en mouvement',
+                           'body': 'Les semelles connectees FeetMe produisent des donnees de marche utiles, mais '
+                                   'difficiles a rendre tangibles. Je cree des animations 3D medicales pour '
+                                   'transformer ces flux biomecaniques en visuels clairs pour investisseurs, '
+                                   'cliniciens ou partenaires.\n'
+                                   '\n'
+                                   'Seriez-vous disponible pour un echange de 15 min ?\n'
+                                   '\n'
+                                   '-- Edgar'}}
 
 def step_scrape(max_leads: int = 9999) -> list[dict]:
     """Étape 1 : Scrape les startups françaises biotech/medtech."""
@@ -154,15 +377,19 @@ def _build_email_for_lead(lead: dict) -> dict:
     prenom = corrected.get("prenom", "")
     use_generic = corrected.get("_use_bonjour_only", False)
 
-    news = get_recent_news_for_company(boite, lead.get("domaine", ""))
+    manual = MANUAL_EMAIL_OVERRIDES.get(str(corrected.get("email", "")).strip().lower())
+    if manual:
+        email_content = manual
+    else:
+        news = get_recent_news_for_company(boite, lead.get("domaine", ""))
 
-    email_content = generate_email(
+        email_content = generate_email(
         company_name=boite,
         prenom=prenom,
         recent_news=news,
         sector="biotech/medtech",
         stage="Seed/Series A"
-    )
+        )
 
     body = email_content["body"]
     subject = email_content["subject"]
@@ -256,6 +483,13 @@ def step_preview_emails() -> list[dict]:
             print(f"[Preview] ERREUR pour {lead.get('email', '')} — {e}")
 
     print(f"{'='*60}")
+    if _pending_emails:
+        PENDING_EMAILS_PATH.write_text(
+            json.dumps(_pending_emails, ensure_ascii=False, indent=2, default=str),
+            encoding="utf-8",
+        )
+        print(f"[Preview] Emails sauvegardes pour validation : {PENDING_EMAILS_PATH}")
+
     print(f"RÉSUMÉ : {len(_pending_emails)} emails prêts à être envoyés")
     print(f"{'='*60}")
     return _pending_emails
