@@ -37,11 +37,12 @@ from modules.leads_csv import (
 _GENERIC_EMAIL_PREFIXES = {
     "contact", "hello", "info", "bonjour", "contact-us", "admin",
     "support", "noreply", "no-reply", "sales", "marketing", "service",
-    "team", "equipe",
+    "team", "equipe", "investor", "investors", "ir",
 }
 _BAD_PRENOM_VALUES = {
     "fondateur", "founder", "contact", "support", "admin", "ceo",
     "directeur", "hello", "marketing", "sales", "service", "team",
+    "investor", "investors", "ir",
 }
 
 
@@ -298,7 +299,11 @@ MANUAL_EMAIL_OVERRIDES: dict[str, dict[str, str]] = {'jhutin@steminov.com': {'su
  'wentworth@transgene.fr': {'subject': 'Transgene en image',
                             'body': 'Les plateformes myvac et Invir.IO de Transgene reposent sur une science tres visuelle : vecteurs viraux, neoantigenes, immunotherapie personnalisee. Je cree des animations 3D medicales pour rendre ces mecanismes comprehensibles en quelques secondes.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'},
  'lsabbagh@domaintherapeutics.com': {'subject': 'Vos GPCR en mouvement',
-                                     'body': 'Domain Therapeutics avance sur des programmes GPCR en immuno-oncologie et inflammation, avec des mecanismes difficiles a vulgariser simplement. Je cree des animations 3D medicales pour rendre ces interactions receptorales claires dans un support investisseur ou partenaire.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'}}
+                                     'body': 'Domain Therapeutics avance sur des programmes GPCR en immuno-oncologie et inflammation, avec des mecanismes difficiles a vulgariser simplement. Je cree des animations 3D medicales pour rendre ces interactions receptorales claires dans un support investisseur ou partenaire.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'},
+ 'alix.lassin.cnum@lovaltechnology.com': {'subject': 'Votre vaccin nasal en image',
+                                          "body": "Lovaltech travaille sur un vaccin proteique par voie nasale, avec un mecanisme qui gagne a etre montre visuellement plutot que decrit en slides. Je cree des animations 3D medicales pour rendre ce type d'approche plus claire pour investisseurs et partenaires.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar"},
+ 'katie.matthews@dbv-technologies.com': {'subject': 'Viaskin en image',
+                                         "body": "Le parcours de Viaskin et de l'immunotherapie epicutanee repose sur un mecanisme tres visuel, utile a rendre clair pour investisseurs et partenaires. Je cree des animations 3D medicales qui rendent ce type d'approche plus immediate a comprendre.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar"}}
 
 
 def _get_contactable_new_leads(df):
@@ -392,6 +397,24 @@ def _get_corrected_lead(row: dict) -> dict:
     return lead
 
 
+def _fallback_email_for_lead(lead: dict) -> dict:
+    """Fallback deterministe si le LLM est indisponible."""
+    corrected = _get_corrected_lead(lead)
+    boite = corrected.get("boite", "cette entreprise")
+    email = str(corrected.get("email", "")).strip().lower()
+
+    manual = MANUAL_EMAIL_OVERRIDES.get(email)
+    if manual:
+        return {"to": email, "subject": manual["subject"], "body": manual["body"]}
+
+    body = (
+        f"{boite} porte des mecanismes ou technologies qui gagnent a etre montres visuellement plutot que decrits en slides. Je cree des animations 3D medicales pour rendre ces sujets plus clairs pour investisseurs et partenaires.\n\n"
+        f"Seriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar"
+    )
+    subject = f"{boite} en image"
+    return {"to": email, "subject": subject, "body": body}
+
+
 def _build_email_for_lead(lead: dict) -> dict:
     """Génère l'email personnalisé pour un lead. Retourne {to, subject, body}."""
     from modules.llm import generate_email
@@ -408,13 +431,17 @@ def _build_email_for_lead(lead: dict) -> dict:
     else:
         news = get_recent_news_for_company(boite, lead.get("domaine", ""))
 
-        email_content = generate_email(
-        company_name=boite,
-        prenom=prenom,
-        recent_news=news,
-        sector="biotech/medtech",
-        stage="Seed/Series A"
-        )
+        try:
+            email_content = generate_email(
+            company_name=boite,
+            prenom=prenom,
+            recent_news=news,
+            sector="biotech/medtech",
+            stage="Seed/Series A"
+            )
+        except Exception as e:
+            print(f"[EmailFallback] {boite}: {e}")
+            return _fallback_email_for_lead(corrected)
 
     body = email_content["body"]
     subject = email_content["subject"]
