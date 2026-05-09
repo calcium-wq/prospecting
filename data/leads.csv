@@ -19,7 +19,7 @@ nom,prenom,boite,domaine,email,linkedin_url,statut,canal,date_email,date_linkedi
 ,Pierre,Biophytis,biophytis.com,pierre.dilda@biophytis.com,https://linkedin.com/in/pjdilda,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
 ,Alexandra,Alcediag,alcediag.com,contact@alcediag.com,https://fr.linkedin.com/in/alexandra-prieux-b5a12933,DNC,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,True,Email generique bloque avant envoi
 Hutin,Jean,StemInov,steminov.com,jhutin@steminov.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
-,Sandra,Metafora Biosystems,metafora-biosystems.com,sandra.moriceau@metafora-biosystems.com,,A verifier,,,,,,,,,Contamination LLM EDIT-B/Alcediag a corriger avant envoi
+,Sandra,Metafora Biosystems,metafora-biosystems.com,sandra.moriceau@metafora-biosystems.com,,Nouveau,,,,,,,,,Verified; manual email override added
 ,Nicolas,Dessintey,dessintey.com,nicolas.fournier@dessintey.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
 ,Jamal,Vect-Horus,vect-horus.com,jamal.temsamani@vect-horus.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
 ,Angelo,Vaxinano,vaxinano.com,angelo.scuotto@vaxinano.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
@@ -28,14 +28,14 @@ Hutin,Jean,StemInov,steminov.com,jhutin@steminov.com,,Email envoyé,Email,2026-0
 ,Anais,NATEOSANTE,nateosante.com,anais.david@nateosante.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
 ,Fondateur,Lovaltech,lovaltech.com,,,Nouveau,,,,,,,,,
 ,Contact,FineHeart,fineheart.fr,contact@fineheart.fr,,DNC,,,,,,,,True,Email generique bloque avant envoi
-,Fondateur,ABIONYX Pharma,abionyx.com,rbarbaras@abionyx.com,,A verifier,,,,,,,,,Prenom/contact a verifier avant envoi
+Barbaras,Ronald,ABIONYX Pharma,abionyx.com,rbarbaras@abionyx.com,,Nouveau,,,,,,,,,"Verified Ronald Barbaras, R&D"
 ,Eric,Affluent Medical,affluentmedical.com,eric.jague@affluentmedical.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
 ,Fondateur,SURGAR,surgar.fr,,,Nouveau,,,,,,,,,
 ,Fondateur,PDCline Pharma,pdc-line.com,,,Nouveau,,,,,,,,,
 ,Contact,Sensorion,sensorion.com,contact@sensorion.com,,DNC,,,,,,,,True,Email generique bloque avant envoi
 ,Fondateur,POXEL,poxelinc.com,,,Nouveau,,,,,,,,,
 ,France,BIOPHTA,biophta.com,france.jean.garrec@biophta.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
-,Adaoust,Pharnext,pharnext.com,adaoust@pharnext.com,,A verifier,,,,,,,,,Prenom Adaoust a verifier avant envoi
+Daoust,Agnes,Pharnext,pharnext.com,adaoust@pharnext.com,,DNC,,,,,,,,True,Do not contact: liquidation / high commercial risk
 ,Brian,ERYTECH,erytech.com,brian.schwab@erytech.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
 ,Contact,KAIROS DISCOVERY,kairos-discovery.com,contact@kairos-discovery.com,,DNC,,,,,,,,True,Email generique bloque avant envoi
 ,Boris,Axomove,axomove.com,boris.leveque@axomove.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
@@ -49,11 +49,11 @@ Hutin,Jean,StemInov,steminov.com,jhutin@steminov.com,,Email envoyé,Email,2026-0
 ,Celine,XENOTHERA,xenothera.com,celine.breda@xenothera.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
 ,Fondateur,DBV Technologies,dbvtechnologies.com,,,Nouveau,,,,,,,,,
 ,Fondateur,Oncovita,oncovita.com,,,Nouveau,,,,,,,,,
-,Fondateur,Alzprotect,alzprotect.com,c.estrella@alzprotect.com,,A verifier,,,,,,,,,Prenom/contact a verifier avant envoi
+Estrella,Cecilia,Alzprotect,alzprotect.com,c.estrella@alzprotect.com,,Nouveau,,,,,,,,,Verified Cecilia Estrella / AZP2006 contact
 ,Contact,LinKinVax,linkinvax.com,contact@linkinvax.com,,DNC,,,,,,,,True,Email generique bloque avant envoi
-,Fondateur,Transgene,transgene.fr,wentworth@transgene.fr,,A verifier,,,,,,,,,Prenom/contact a verifier avant envoi
+Wentworth,James,Transgene,transgene.fr,wentworth@transgene.fr,,Nouveau,,,,,,,,,"Verified James Wentworth, CBO"
 ,Romain,SEABELIFE,seabelife.com,romain.lucas@seabelife.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
-,Fondateur,DOMAIN Therapeutics,domaintherapeutics.com,lsabbagh@domaintherapeutics.com,,A verifier,,,,,,,,,Prenom/contact a verifier avant envoi
+Sabbagh,Laurent,DOMAIN Therapeutics,domaintherapeutics.com,lsabbagh@domaintherapeutics.com,,Nouveau,,,,,,,,,Verified Laurent Sabbagh / Domain Therapeutics NA
 ,Fondateur,Amolyt Pharma,amolytpharma.com,,,Nouveau,,,,,,,,,
 ,Pauline,Avatar Medical,avatarmedical.ai,pauline@avatarmedical.ai,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,
 ,Pascal,VALBIOTIS,valbiotis.com,pascal.sirvent@valbiotis.com,,Email envoyé,Email,2026-05-09,,2026-05-12,2026-05-16,2026-05-23,,,

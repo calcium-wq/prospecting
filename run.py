@@ -55,6 +55,10 @@ PRENOM_CORRECTIONS: dict[str, tuple[str, str]] = {
     "prinaudo@enterome.com":       ("Philippe", "Rinaudo"),
     "ofriedrich@cellprothera.com": ("Olivier", "Friedrich"),
     "jhutin@steminov.com":         ("Jean", "Hutin"),
+    "rbarbaras@abionyx.com":       ("Ronald", "Barbaras"),
+    "c.estrella@alzprotect.com":   ("Cecilia", "Estrella"),
+    "wentworth@transgene.fr":      ("James", "Wentworth"),
+    "lsabbagh@domaintherapeutics.com": ("Laurent", "Sabbagh"),
 }
 
 NOTIFY_PRENOM = {}
@@ -284,7 +288,17 @@ MANUAL_EMAIL_OVERRIDES: dict[str, dict[str, str]] = {'jhutin@steminov.com': {'su
                                    '\n'
                                    'Seriez-vous disponible pour un echange de 15 min ?\n'
                                    '\n'
-                                   '-- Edgar'}}
+                                   '-- Edgar'},
+ 'sandra.moriceau@metafora-biosystems.com': {'subject': 'Metafora en image',
+                                             'body': 'Metafora biosystems travaille sur la caracterisation du metabolisme cellulaire, un sujet puissant mais difficile a expliquer vite. Je cree des animations 3D medicales pour rendre ces flux biologiques plus clairs dans un deck investisseur ou partenaire.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'},
+ 'rbarbaras@abionyx.com': {'subject': 'ABIONYX en mouvement',
+                           'body': 'ABIONYX developpe des therapies pour les maladies renales et ophtalmologiques, avec une expertise forte autour des vecteurs HDL. Je cree des animations 3D medicales pour rendre ces mecanismes biologiques visibles et plus faciles a comprendre en presentation.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'},
+ 'c.estrella@alzprotect.com': {'subject': 'AZP2006 en image',
+                               'body': 'AZP2006 et la voie progranuline touchent a des mecanismes neurodegeneratifs complexes : tauopathies, inflammation, survie neuronale. Je cree des animations 3D medicales pour transformer ce type de mecanisme en support clair pour investisseurs ou partenaires.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'},
+ 'wentworth@transgene.fr': {'subject': 'Transgene en image',
+                            'body': 'Les plateformes myvac et Invir.IO de Transgene reposent sur une science tres visuelle : vecteurs viraux, neoantigenes, immunotherapie personnalisee. Je cree des animations 3D medicales pour rendre ces mecanismes comprehensibles en quelques secondes.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'},
+ 'lsabbagh@domaintherapeutics.com': {'subject': 'Vos GPCR en mouvement',
+                                     'body': 'Domain Therapeutics avance sur des programmes GPCR en immuno-oncologie et inflammation, avec des mecanismes difficiles a vulgariser simplement. Je cree des animations 3D medicales pour rendre ces interactions receptorales claires dans un support investisseur ou partenaire.\n\nSeriez-vous disponible pour un echange de 15 min ?\n\n-- Edgar'}}
 
 def step_scrape(max_leads: int = 9999) -> list[dict]:
     """Étape 1 : Scrape les startups françaises biotech/medtech."""
