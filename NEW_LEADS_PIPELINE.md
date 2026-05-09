@@ -98,8 +98,37 @@
 
 ---
 
-## Stats
+---
 
-- Trouves: 13 leads nouveaux (hors TBD)
-- Top 5 priorite A: tous avec levée recente 2024-2025
-- Sources principales: Bpifrance, VC news, SATT
+## Top 10 Premium Leads (Mise a jour 2026-05-10)
+
+Ces leads sont selectionnes pour leur fort potentiel 3D :
+
+| # | Entreprise | Domaine | Why 3D Fit | Priorité | Angle Email |
+|---|------------|---------|------------|----------|-------------|
+| 1 | **Adcytherix** | adcytherix.com | Mécanisme ADC (anticorps + toxine) - visuel et complexe | A | "Votre levée €105M et votre technologie ADC méritent une animation claire pour vos présentations investisseurs" |
+| 2 | **SurgAR** | suargar.fr | Realité augmentée chirurgicale - digital twin + vue laparoscopique en temps réel | A | "Votre software AR qui superpose le jumeau numérique sur la vue оператора est exactement le genre de visuel qu'on peut animer" |
+| 3 | **AREAS** | areas.ai | AR pour arthroscopie - tracking 3D articulaire, mélange réalité mixt | A | "Votre technologie de tracking articulaire et réalité mixte serait parfaite pour une animation explicative" |
+| 4 | **One Biosciences** | onebiosciences.fr | Données single-cell, hétérogénéité tumorale | A | "Votre plateforme single-cell pour décoder l'hétérogénéité tumorale se prête à une animation élégante du mécanisme" |
+| 5 | **Chipiron** | chipiron.com | MRI portable - innovation technique visible | A | "Votre scanner MRI miniaturisé a une histoire forte à raconter en animation" |
+| 6 | **Okeiro** | okeiro.com | Algorithme prédictif greffe + AI | A | "Votre algorithme iBox qui prédit les complications de greffe serait idéal pour une animation explicative" |
+| 7 | **HEPTA Medical** | heptamedical.com | Ablation micro-ondes pulmonaire, capteurs temperature | A | "Votre sonde d'ablation avec suivi thermique temps réel se visualise très bien en 3D" |
+| 8 | **Orakl Oncology** | orakl-oncology.com | Plateforme IA drug development, predictions | B | "Votre plateforme techbio qui prédit la réponse aux traitements a besoin d'une animation claire" |
+| 9 | **Sirius Neosight** | sirius-neosight.com | Isolation CTCs par fluidity membranaire | B | "Votre technologie d'isolation des cellules tumorales circulantes a un mécanisme visuel élégant" |
+| 10 | **MSInsight** | msinsight.fr | Test MSI diagnostic, biomarker detection | B | "Votre test diagnostic MSI basé sur l'instabilité des microsatellites se explique parfaitement en animation" |
+
+### Sources principales
+
+| Source | Leads premium |
+|--------|---------------|
+| **VC/LEVEE NEWS (Blast, Elaia, Andera)** | Adcytherix, Chipiron, SurgAR, AREAS, One Biosciences |
+| **Bpifrance / France 2030** | HEPTA, Okeiro, AREAS |
+| **Spin-offs hôpitaux** | SurgAR (CHU Clermont-Ferrand), AREAS (Grenoble) |
+
+### Stats
+
+- **10 leads premium** identifiés
+- **8 priorite A** - fort fit 3D
+- **2 priorite B** - bon potentiel
+-Tous avec levée recente 2024-2025
+- Meilleure source: VC news + levées Series A 2025
