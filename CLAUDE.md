@@ -157,6 +157,19 @@ step_monitor_replies→ Vérifie Gmail IMAP, traite réponses, notifie Telegram
 - Si mots-clés négatifs détectés (pas intéressé, no thanks, unsubscribe, stop) → marquer "DNC"
 - Si réponse positive → marquer "Intéressé" et envoyer notification Telegram
 
+### Réponse positive — que faire
+1. Répondre dans les 2h max
+2. Template réponse :
+   Objet : Re: [même sujet]
+   Corps (max 60 mots) :
+   "Bonjour [Prénom],
+   Merci pour votre retour — ravi que ça résonne.
+   Je vous propose un appel de 15 min cette semaine pour voir si je peux vous aider concrètement.
+   Vous êtes disponible jeudi ou vendredi en fin de matinée ?
+   — Edgar"
+3. Mettre statut Notion → "Call planifié"
+4. Notification Telegram automatique déjà active
+
 ### Notifications Telegram
 - Token dans .env sous TELEGRAM_BOT_TOKEN
 - Chat ID dans .env sous TELEGRAM_CHAT_ID
