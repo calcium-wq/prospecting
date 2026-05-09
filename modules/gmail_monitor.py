@@ -58,6 +58,9 @@ def check_replies() -> list[dict]:
 
         df = load_leads()
         known_emails = set(df["email"].dropna().values)
+        already_processed = set(
+            df[df["reponse"].fillna("").astype(str).str.strip() != ""]["email"].dropna().values
+        )
 
         for num in data[0].split():
             try:
@@ -75,8 +78,11 @@ def check_replies() -> list[dict]:
                 else:
                     sender_email = from_header.strip()
 
-                # Only process if it's from a known lead
+                # Only process if it's from a known lead, and avoid repeating the same notification.
+                # Do not mark messages as read: Edgar must see prospect replies in Gmail.
                 if sender_email not in known_emails:
+                    continue
+                if sender_email in already_processed:
                     continue
 
                 negative = _is_negative(body + subject)
@@ -86,8 +92,6 @@ def check_replies() -> list[dict]:
                     "body": body[:500],
                     "is_negative": negative
                 })
-                # Mark as seen
-                mail.store(num, "+FLAGS", "\\Seen")
 
             except Exception as e:
                 log_error("gmail_monitor", e, "parse message")
