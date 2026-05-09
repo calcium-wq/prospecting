@@ -23,13 +23,13 @@
 | 1 | **DBV Technologies** | dbvtechnologies.com | Biotech cotée Nasdaq, Phase 3 VITESSE résultats Q4 2025, $306M levé, BLA submission 2026 | Site + LinkedIn execs + SEC filings |
 | 2 | **Oncovita** | oncovita.com | Spin-off Institut Pasteur, vaccin immunothérapie cancer, €8M France 2030, trial Phase 1/2a 2025 | Institut Pasteur + BPI + LinkedIn |
 | 3 | **HighLife** | highlifesas.com | Medtech cardiaque (valve mitrale), CE mark 2025, FDA IDE approved, marché $10B | Site + LinkedIn surgeons + Congrès |
-| 4 | **Amolyt Pharma** | amolytpharma.com | Acquis par AstraZeneca $1.05B (2024), Phase 3 hypoparathyroïdie | AstraZeneca France / Alexion |
-| 5 | **Qubit Pharmaceuticals** | qubitpharma.com | Biotech drug discovery AI, levée récente | Site + LinkedIn founders + Crunchbase |
-| 6 | **Caranx Medical** | caranxmedical.com | Medtech cardiovasculaire, technologies invasives | Site + LinkedIn + Annonces FDA |
-| 7 | **POXEL** | poxelinc.com | Biotech cotée Euronext, maladies métaboliques | Site + Rapports annuels + LinkedIn IR |
-| 8 | **Advanced BioDesign** | advancedbiodesign.fr | Biotech développement anticorps | Site + Publications + LinkedIn |
-| 9 | **PDCline Pharma** | pdc-line.com | Thérapies cellulaires cancer, trials cliniques | Site + LinkedIn + clinicaltrials.gov |
-| 10 | **Lovaltech** | lovaltech.com | Biotech levures bioproduction | Site + LinkedIn founders |
+| 4 | **Qubit Pharmaceuticals** | qubitpharma.com | Biotech drug discovery AI, levée récente | Site + LinkedIn founders + Crunchbase |
+| 5 | **Caranx Medical** | caranxmedical.com | Medtech cardiovasculaire, technologies invasives | Site + LinkedIn + annonces réglementaires |
+| 6 | **POXEL** | poxelinc.com | Biotech cotée Euronext, maladies métaboliques | Site + rapports annuels + LinkedIn IR |
+| 7 | **Advanced BioDesign** | advancedbiodesign.fr | Biotech développement anticorps | Site + publications + LinkedIn |
+| 8 | **PDCline Pharma** | pdc-line.com | Thérapies cellulaires cancer, essais cliniques | Site + LinkedIn + clinicaltrials.gov |
+| 9 | **Lovaltech** | lovaltech.com | Biotech bioproduction / levures | Site + LinkedIn founders |
+| 10 | **DBV / HighLife / Oncovita backup batch** | - | Si les 9 premiers n'aboutissent pas rapidement, reprendre les 3 plus chauds déjà ci-dessus avec enrichissement manuel plus agressif | Site + dirigeants + Hunter + contact presse |
 
 ---
 
@@ -48,33 +48,33 @@
 - **Action**: Chercher Stefan Pilz (CEO) sur LinkedIn, email via site corporate
 - **Contexte**: CE mark obtenu mai 2025,FDA pivotal trial
 
-### 4. Amolyt Pharma
-- **Action**: Maintenant sous AstraZeneca — chercher contact Alexion France
-- **Contexte**: $1.05B acquisition juillet 2024
-
-### 5. Qubit Pharmaceuticals
+### 4. Qubit Pharmaceuticals
 - **Action**: Site + LinkedIn founders, vérifier Crunchbase
-- **Contexte**: Drug discovery AI,presentations investisseurs
+- **Contexte**: Drug discovery AI, présentations investisseurs
 
-### 6. Caranx Medical
+### 5. Caranx Medical
 - **Action**: Site medical + LinkedIn équipe cardiovasculaire
 - **Contexte**: dispositifs médicaux innovants
 
-### 7. POXEL
+### 6. POXEL
 - **Action**: Contact IR ou LinkedIn, chercher email corporate
 - **Contexte**: biotech cotée, résultats cliniques à communiquer
 
-### 8. Advanced BioDesign
+### 7. Advanced BioDesign
 - **Action**: Site + LinkedIn + PubMed pour publications scientifiques
-- **Contexte**: anticorps thérapeutiquess
+- **Contexte**: anticorps thérapeutiques
 
-### 9. PDCline Pharma
+### 8. PDCline Pharma
 - **Action**: Site + LinkedIn + clinicaltrials.gov
-- **Contexte**: thérapies cellulaires, ensayos actifs
+- **Contexte**: thérapies cellulaires, essais actifs
 
-### 10. Lovaltech
+### 9. Lovaltech
 - **Action**: Site biotech + LinkedIn founders
 - **Contexte**: bioproduction, technologie levures
+
+### 10. Amolyt Pharma
+- **Action**: Ne pas enrichir pour prospection active standard
+- **Contexte**: société acquise, à sortir des priorités commerciales
 
 ---
 
@@ -86,5 +86,5 @@ Les leads "Nouveau" restent en état tant que l'enrichissement n'a pas fourni d'
 
 ## Notes
 
-- Les 9 autres leads sans email (Lovaltech, Spade, Sonio, BioMAdvanced, SURGAR, etc.) sont priorisés B/C
+- Les autres leads sans email comme Spade, Sonio, BioMAdvanced et SURGAR restent en priorité B/C
 - Les 5 leads sans domaine sont à ignorer ou à vérifier manuellement

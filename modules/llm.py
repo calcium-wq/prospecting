@@ -164,14 +164,30 @@ def generate_personalized_hook(company_name: str, prenom: str, recent_news: str,
 
 def generate_followup_j3(company_name: str, prenom: str) -> dict:
     """Relance J+3 - courte, directe, sans culpabilisation."""
-    system = """Tu es Edgar. Relance concise, 1-2 phrases, 15-20 mots.
+    system = """Tu es Edgar. Tu écris en FRANCAIS uniquement, comme un humain, pas comme un assistant commercial.
+Relance concise, naturelle, 1-2 phrases, 18-30 mots maximum hors signature.
 RÈGLES ABSOLUES — INTERDIT :
+- Pas d'anglais
 - Pas de "j'espère que vous allez bien"
 - Pas de "vous n'avez peut-être pas eu le temps"
 - Pas de faute de conjugaison ("pour échange" → INTERDIT, utiliser "pour échanger")
 - Pas de question condescendante type "Avez-vous déjà envisagé"
-- La question finale DOIT mener vers un call de 15 min.
-OK: phrase directe + question vers un call."""
+- Pas de langage trop vendeur ou abstrait
+- Une seule question finale, vers un call de 15 min
+FORMAT ATTENDU :
+- salutation courte
+- une phrase simple
+- une seule question finale
+- signature "— Edgar"
+EXEMPLE DE TON :
+"Marie,
+
+Je me permets une courte relance au cas ou mon message soit tombe au mauvais moment.
+
+Un echange de 15 min cette semaine vous serait-il utile ?
+
+— Edgar"
+"""
 
     context = f"Destinataire: {prenom},entreprise: {company_name}\n\nGénère une relance courte et naturelle."
 
@@ -182,14 +198,34 @@ OK: phrase directe + question vers un call."""
 
 def generate_followup_j7(company_name: str, prenom: str, sector: str = "") -> dict:
     """Relance J+7 - nouvel angle avec cas concret."""
-    system = """Tu es Edgar. Relance avec un exemple concret, 40-50 mots.
+    system = """Tu es Edgar. Tu écris en FRANCAIS uniquement, comme un humain, pas comme un assistant commercial.
+Relance avec un exemple concret, 35-50 mots maximum hors signature.
 RÈGLES ABSOLUES — INTERDIT :
+- Pas d'anglais
 - PAS "pour être concret" (daté)
 - PAS de liste de références
 - Pas de faute de conjugaison
 - Pas de question condescendante
-- La question finale DOIT mener vers un call de 15 min
-NARRATIF: raconte un micro-résultat (pas "j'ai animé", plutôt "j'ai fait un visuel...")."""
+- Pas de langage pompeux
+- Une seule question finale, vers un call de 15 min
+NARRATIF :
+- raconte un micro-resultat credible
+- pas de nom de client
+- pas de promesse exageree
+FORMAT ATTENDU :
+- salutation
+- micro-cas concret en 1-2 phrases
+- une seule question finale
+- signature "— Edgar"
+EXEMPLE DE TON :
+"Marie,
+
+J'ai recemment prepare un visuel court pour aider une biotech a rendre son mecanisme plus clair en reunion investisseur. Je pense que ce format pourrait aussi vous aider si le sujet est d'actualite.
+
+Un echange de 15 min vous semblerait-il utile ?
+
+— Edgar"
+"""
 
     context = f"Destinataire: {prenom},entreprise: {company_name},secteur: {sector}\n\nGénère une relance avec un mini-cas client, sans nommer le client."
 
@@ -199,16 +235,28 @@ NARRATIF: raconte un micro-résultat (pas "j'ai animé", plutôt "j'ai fait un v
 
 def generate_followup_j14(company_name: str, prenom: str) -> dict:
     """Break-up email J+14 - derniers mots, sans pression, naturel."""
-    system = """Tu es Edgar. Dernier email de la séquence, naturel et bienveillant, 10-15 mots max.
+    system = """Tu es Edgar. Dernier email de la séquence, en FRANCAIS uniquement, naturel et bienveillant, 18-30 mots maximum hors signature.
 RÈGLES ABSOLUES — INTERDIT :
+- Pas d'anglais
 - Pas "je ferme le dossier" (robotique)
 - Pas "je reste disponible" (cliché)
 - Pas "ok, on se refuse" (maladroit)
 - Pas "pour être concret" (daté)
 - Pas de faute de conjugaison
 - Pas de question condescendante "Avez-vous déjà envisagé"
-- La question finale DOIT mener vers un call de 15 min
-Ton naturel: "Je ne vous relance pas davantage. Si le sujet devient utile plus tard, je serai ravi d'en discuter." ou similaire, bienveillant sans pression."""
+- Pas de double formulation type "a nouveau" répétée
+- Pas obligé de poser une question sur ce dernier message
+FORMAT ATTENDU :
+- salutation
+- une phrase de cloture simple
+- signature "— Edgar"
+EXEMPLE DE TON :
+"Marie,
+
+Je ne vous relance pas davantage. Si le sujet devient utile plus tard, nous pourrons en reparler.
+
+— Edgar"
+"""
 
     context = f"Destinataire: {prenom},entreprise: {company_name}\n\nGénère un message de clôture naturel et court."
 

@@ -10,6 +10,62 @@ from modules.notion_crm import log_action
 from modules.gmail_monitor import check_replies, process_replies
 from datetime import date
 
+SAFE_AUTOMATIC_FOLLOWUPS = True
+
+
+def fallback_followup(lead: dict, day: int) -> dict:
+    """Fallback humain si le LLM produit une relance faible ou invalide."""
+    prenom = (lead.get("prenom", "") or "Bonjour").strip()
+    if day == 3:
+        body = (
+            f"{prenom},\n\n"
+            "Je me permets une courte relance au cas ou mon precedent message soit passe au mauvais moment.\n\n"
+            "Un echange de 15 min cette semaine vous serait-il utile ?\n\n"
+            "-- Edgar"
+        )
+    elif day == 7:
+        body = (
+            f"{prenom},\n\n"
+            "J'ai recemment prepare un visuel court pour rendre un mecanisme biotech plus clair en reunion investisseur. "
+            "Je pense que ce format pourrait aussi vous aider si le sujet est d'actualite.\n\n"
+            "Un echange de 15 min vous semblerait-il utile ?\n\n"
+            "-- Edgar"
+        )
+    elif day == 14:
+        body = (
+            f"{prenom},\n\n"
+            "Je ne vous relance pas davantage. Si le sujet devient utile plus tard, nous pourrons en reparler.\n\n"
+            "-- Edgar"
+        )
+    else:
+        body = ""
+    return {"subject": f"Re: {lead.get('boite', '')}", "body": body}
+
+
+def looks_suspicious_followup(body: str) -> str:
+    """Heuristiques simples pour éviter les relances LLM bizarres."""
+    text = (body or "").lower()
+    suspicious_markers = [
+        "dear team",
+        "dear ",
+        "would a 15-minute call",
+        "would a 15 minute call",
+        "representative",
+        "chere madame",
+        "chère madame",
+        "n'hesitez pas",
+        "n'hésitez pas",
+        "point final",
+        "souhaiterriez",
+        "notre prevu",
+        "our previous",
+        "quick follow-up",
+    ]
+    for marker in suspicious_markers:
+        if marker in text:
+            return marker
+    return ""
+
 
 def validate_followup(body: str) -> tuple[bool, str, str]:
     """
@@ -29,6 +85,9 @@ def validate_followup(body: str) -> tuple[bool, str, str]:
         "je reste disponible",
         "je ferme le dossier",
         "avez-vous déjà envisagé",
+        "would a 15-minute call",
+        "would a 15 minute call",
+        "dear team",
     ]
     for phrase in forbidden_phrases:
         if phrase in body_lower:
@@ -37,8 +96,14 @@ def validate_followup(body: str) -> tuple[bool, str, str]:
     question_count = body.count("?")
     if question_count > 1:
         return False, f"Plusieurs questions ({question_count})", body
+    if body.count("— Edgar") > 1 or body.count("-- Edgar") > 1:
+        return False, "Signature dupliquee", body
+    if '"' in body or "“" in body or "”" in body:
+        return False, "Guillemets parasites", body
 
     corrected = body
+    if "-- Edgar" in corrected and "— Edgar" not in corrected:
+        corrected = corrected.replace("-- Edgar", "— Edgar")
     if "-- Edgar" not in body and "— Edgar" not in body:
         corrected = body.rstrip() + "\n\n— Edgar"
 
@@ -66,21 +131,31 @@ def _send_llm_followup(lead: dict, day: int) -> bool:
     prenom = lead.get("prenom", "")
     boite = lead.get("boite", "")
 
-    if day == 3:
-        content = generate_followup_j3(boite, prenom)
-    elif day == 7:
-        content = generate_followup_j7(boite, prenom)
-    elif day == 14:
-        content = generate_followup_j14(boite, prenom)
+    if SAFE_AUTOMATIC_FOLLOWUPS:
+        content = fallback_followup(lead, day)
     else:
-        return False
+        if day == 3:
+            content = generate_followup_j3(boite, prenom)
+        elif day == 7:
+            content = generate_followup_j7(boite, prenom)
+        elif day == 14:
+            content = generate_followup_j14(boite, prenom)
+        else:
+            return False
 
     body = content.get("body", "")
     is_valid, error, corrected_body = validate_followup(body)
-    if not is_valid:
+    suspicious_marker = looks_suspicious_followup(body)
+    if not is_valid or suspicious_marker:
         log_error("followup", Exception(error), f"Validation échouée pour {email_addr} J+{day}")
-        print(f"[Followup] VALIDATION ÉCHOUÉE J+{day} {email_addr}: {error}")
-        return False
+        reason = error or f"Marqueur suspect: {suspicious_marker}"
+        print(f"[Followup] VALIDATION ÉCHOUÉE J+{day} {email_addr}: {reason}")
+        content = fallback_followup(lead, day)
+        is_valid, error, corrected_body = validate_followup(content["body"])
+        if not is_valid:
+            log_error("followup", Exception(error), f"Fallback échoué pour {email_addr} J+{day}")
+            print(f"[Followup] FALLBACK ÉCHOUÉ J+{day} {email_addr}: {error}")
+            return False
 
     success = _send_smtp(email_addr, content["subject"], corrected_body)
     if success:
