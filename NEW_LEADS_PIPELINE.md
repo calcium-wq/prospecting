@@ -121,14 +121,43 @@ Ces leads sont selectionnes pour leur fort potentiel 3D :
 
 | Source | Leads premium |
 |--------|---------------|
-| **VC/LEVEE NEWS (Blast, Elaia, Andera)** | Adcytherix, Chipiron, SurgAR, AREAS, One Biosciences |
-| **Bpifrance / France 2030** | HEPTA, Okeiro, AREAS |
-| **Spin-offs hôpitaux** | SurgAR (CHU Clermont-Ferrand), AREAS (Grenoble) |
+| **VC/LEVEE NEWS (Blast, Elaia, Andera)** | Adcytherix, Chipiron, SurgAR, AREAS, One Biosciences, Robeauté |
+| **Bpifrance / France 2030** | HEPTA, Okeiro, AREAS, Apmonia, SpinEM |
+| **Spin-offs hôpitaux** | SurgAR (CHU Clermont-Ferrand), AREAS (Grenoble), ErVimmune (Leon Berard) |
 
-### Stats
+---
 
-- **10 leads premium** identifiés
-- **8 priorite A** - fort fit 3D
-- **2 priorite B** - bon potentiel
--Tous avec levée recente 2024-2025
-- Meilleure source: VC news + levées Series A 2025
+## 10 Nouveaux Leads Premium (Batch 2)
+
+| # | Entreprise | Domaine | Why 3D Fit | Priorité | Angle Email | Type Contact |
+|---|------------|---------|------------|----------|-------------|--------------|
+| 1 | **ErVimmune** | ervimmune.com | Cancer vaccine ciblant HERV - mécanisme viral独特, Phase I 2026 | A | "Votre vaccin anticancer basé sur les rétrovirus endogènes est un mécanisme visuel passionnant" | CEO (Nathalie Donne) - LinkedIn |
+| 2 | **Robeauté** | robeaute.com | Micro-robots neurochirurgicaux - mouvement dans le cerveau, 50 brevets | A | "Vos micro-robots cérébraux de la taille d'un grain de riz sont exactement le genre d'innovation à montrer en animation" | Bertrand Duplat (CEO) - LinkedIn |
+| 3 | **Apmonia Therapeutics** | apmonia-therapeutics.com | Thérapie peptidique micro-environnement tumoral, Phase I 2026 | A | "Votre peptide TAX2 qui ciblel'interaction TSP-1/CD47 a un mécanisme visuel clair" | CEO - site corporate |
+| 4 | **SpinEM Robotics** | spinem-robotics.com | Navigation robotique colonne vertébrale - tracking sans ligne de vue | A | "Votre système de tracking chirurgical sans visibilité directe se explique parfaitement en 3D" | Stephane Morvan (CEO) - LinkedIn |
+| 5 | **Scap Hologram** | scaphologram.com | Navigation épaule par hologramme - réalité augmentée chirurgicale | A | "Votre solution de navigation pour chirurgie de l'épaule avec localisateur miniature est très visuelle" | Delphine Henry (CEO) - LinkedIn |
+| 6 | **Ventuno Biotech** | ventuno-biotech.com | Immunothérapie cancerInnovante - nouvelle approche | B | "Vos immunotherapiesNovel cancer ont un mécanisme à expliquer visuellement" | CEO (Jeremy Bastid) - LinkedIn |
+| 7 | **HEPHAISTOS-Pharma** | hephaistos-pharma.fr | ONCO-Boost immunostimulant - ciblage immunité innée | B | "Votre ONCO-Boost qui stimule l'immunitéinnée est un mécanisme visuel fort" | CEO - site |
+| 8 | **kyron.bio** | kyron.bio | Glycan engineering - contrôle glycosylation anticorps | B | "Votre plateforme de glycosylation avec 97% de consistance est un mécanisme élégant" | CEO (Emilia McLaughlin) - LinkedIn |
+| 9 | **Enodia Therapeutics** | enodiatx.com | Dégradation protéique via SEC61 - plateforme ML | B | "Votre cible SEC61 au point de synthèse protéique est un mécanisme molecular avancé" | CEO (Yves Ribeill) - LinkedIn |
+| 10 | **MSInsight** | msinsight.fr | Diagnostic MSI - test génomique cancer | B | "Votre test MSI basé sur l'instabilité des microsatellites se visualise bien" | Arnaud Cutivet (CEO) - LinkedIn |
+
+---
+
+### Stats globaux
+
+- **20 leads premium** identifiés (10 + 10)
+- **16 priorite A** - fort fit 3D
+- **4 priorite B** - bon potentiel
+- **Tous avec levée recente 2024-2026**
+- **Meilleure source**: VC news (Blast, Plural, Cherry Ventures, Andera) + Bpifrance
+
+### Top 5 immédiats (tous leads confondus)
+
+| # | Entreprise | Why 3D Fit | Levée |
+|---|------------|------------|-------|
+| 1 | **Adcytherix** | Mécanisme ADC (anticorps + toxine) | €105M 2025 |
+| 2 | **Robeauté** | Micro-robots cerveau, storytelling fort | €27M 2025 |
+| 3 | **SurgAR** | AR chirurgicale - digital twin temps réel | €11M 2024 |
+| 4 | **ErVimmune** | Vaccin cancer HERV, mécanisme viral | €17M 2026 |
+| 5 | **Chipiron** | MRI portable - innovation tech visible | €14.9M 2025 |
