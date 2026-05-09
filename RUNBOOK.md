@@ -437,16 +437,40 @@ tail -10 ~/prospecting/data/followup.log
 
 ## Conversion d'un prospect intéressé
 
-Quand un prospect répond positivement, ouvrir `SALES_PLAYBOOK.md`.
-Si le prospect demande un exemple, ouvrir `PORTFOLIO_DEMO_BRIEF.md`.
+### Etape 1 : Repondre dans les 2h
 
-Objectif immédiat :
-- répondre dans les 2h ;
-- obtenir un call de 15 min ;
-- comprendre le mécanisme à expliquer, l'audience et la deadline ;
-- proposer une animation courte entre 3000 et 5000 euros selon complexité.
+Ouvrir `SALES_PLAYBOOK.md` section 1 pour le template de reponse positive.
+Mettre a jour Notion avec Statut = "Call propose".
 
-Ne pas improviser le pricing en live : utiliser le cadrage du playbook.
+### Etape 2 : Gerer les objections
+
+Si le prospect demande "un exemple" → SALES_PLAYBOOK.md section 2.1 + PORTFOLIO_DEMO_BRIEF.md
+Si le prospect demande "quel budget" → SALES_PLAYBOOK.md section 2.2
+Si le prospect dit "pas le bon moment" → SALES_PLAYBOOK.md section 2.3
+
+### Etape 3 : Preparer le call
+
+Ouvrir SALES_PLAYBOOK.md section 3.
+Les 5 questions obligatoires :
+1. Objectif (levée / conference / partners)
+2. Audience (investisseurs / pharma / patients)
+3. Deadline
+4. Existant (deck / schema)
+5. Element indispensable
+
+**Checklist** : Verifier que la demo est prete (PORTFOLIO_DEMO_BRIEF.md section 6).
+
+### Etape 4 : apres le call
+
+Envoyer le devis dans les 2h via SALES_PLAYBOOK.md section 5.
+Ne jamais improviser le prix — utiliser les criteres 3000 vs 5000 de la section 4.
+
+### Regles de conversion
+
+- Repondre dans les 2h
+- Ne jamais donner de prix sans avoir qualifie le besoin (Q1-Q5)
+- Ne jamais envoyer de demo sans cadrage prealable
+- Toujours proposer une prochaine etape concrete
 
 ---
 
