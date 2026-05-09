@@ -16,75 +16,95 @@
 
 ---
 
-## Top 10 leads à enrichir (Priorité A)
+## Classification des 19 leads sans email
 
-| # | Entreprise | Domaine | Pourquoi intéressant | Source à chercher |
-|---|------------|---------|----------------------|-------------------|
-| 1 | **DBV Technologies** | dbvtechnologies.com | Biotech cotée Nasdaq, Phase 3 VITESSE résultats Q4 2025, $306M levé, BLA submission 2026 | Site + LinkedIn execs + SEC filings |
-| 2 | **Oncovita** | oncovita.com | Spin-off Institut Pasteur, vaccin immunothérapie cancer, €8M France 2030, trial Phase 1/2a 2025 | Institut Pasteur + BPI + LinkedIn |
-| 3 | **HighLife** | highlifesas.com | Medtech cardiaque (valve mitrale), CE mark 2025, FDA IDE approved, marché $10B | Site + LinkedIn surgeons + Congrès |
-| 4 | **Qubit Pharmaceuticals** | qubitpharma.com | Biotech drug discovery AI, levée récente | Site + LinkedIn founders + Crunchbase |
-| 5 | **Caranx Medical** | caranxmedical.com | Medtech cardiovasculaire, technologies invasives | Site + LinkedIn + annonces réglementaires |
-| 6 | **POXEL** | poxelinc.com | Biotech cotée Euronext, maladies métaboliques | Site + rapports annuels + LinkedIn IR |
-| 7 | **Advanced BioDesign** | advancedbiodesign.fr | Biotech développement anticorps | Site + publications + LinkedIn |
-| 8 | **PDCline Pharma** | pdc-line.com | Thérapies cellulaires cancer, essais cliniques | Site + LinkedIn + clinicaltrials.gov |
-| 9 | **Lovaltech** | lovaltech.com | Biotech bioproduction / levures | Site + LinkedIn founders |
-| 10 | **DBV / HighLife / Oncovita backup batch** | - | Si les 9 premiers n'aboutissent pas rapidement, reprendre les 3 plus chauds déjà ci-dessus avec enrichissement manuel plus agressif | Site + dirigeants + Hunter + contact presse |
+### 🔴 HORS SCOPE / MORT (6)
 
----
+| Entreprise | Raison |
+|------------|--------|
+| **Amolyt Pharma** | ACQUISE par AstraZeneca en juillet 2024 ($1.05B) |
+| CREAPHARM BIOSERVICES | Pas de domaine, impossible à tracer |
+| Avatar Medical Vision | Pas de domaine, impossible à tracer |
+| NATÉOSANTÉ | Pas de domaine, impossible à tracer |
+| Walid S. Kamoun | Individu sans structure identifiable |
+| EVERZOM et OmniSpirant | Pas de domaine, nom composite flou |
 
-## Prochaines actions concrètes
-
-### 1. DBV Technologies
-- **Action**: Rechercher CEO/CMO sur LinkedIn, vérifier Hunter.io, email site
-- **Contact potentiel**: Daniel T. (CEO), найти via LinkedIn
-- ** Contexte animation**: Phase 3 ensayos cliniques, données visuelles importantes
-
-### 2. Oncovita
-- **Action**: Contacter via Institut Pasteur alumni, BPI France
-- **Contexte**: vaccin immunothérapie cancer, levée 2023
-
-### 3. HighLife
-- **Action**: Chercher Stefan Pilz (CEO) sur LinkedIn, email via site corporate
-- **Contexte**: CE mark obtenu mai 2025,FDA pivotal trial
-
-### 4. Qubit Pharmaceuticals
-- **Action**: Site + LinkedIn founders, vérifier Crunchbase
-- **Contexte**: Drug discovery AI, présentations investisseurs
-
-### 5. Caranx Medical
-- **Action**: Site medical + LinkedIn équipe cardiovasculaire
-- **Contexte**: dispositifs médicaux innovants
-
-### 6. POXEL
-- **Action**: Contact IR ou LinkedIn, chercher email corporate
-- **Contexte**: biotech cotée, résultats cliniques à communiquer
-
-### 7. Advanced BioDesign
-- **Action**: Site + LinkedIn + PubMed pour publications scientifiques
-- **Contexte**: anticorps thérapeutiques
-
-### 8. PDCline Pharma
-- **Action**: Site + LinkedIn + clinicaltrials.gov
-- **Contexte**: thérapies cellulaires, essais actifs
-
-### 9. Lovaltech
-- **Action**: Site biotech + LinkedIn founders
-- **Contexte**: bioproduction, technologie levures
-
-### 10. Amolyt Pharma
-- **Action**: Ne pas enrichir pour prospection active standard
-- **Contexte**: société acquise, à sortir des priorités commerciales
+→ **Action**: Marquer "hors scope" dans leads.csv, ne plus prospecter
 
 ---
 
-## Statut actuel (ne pas modifier sans preuve)
+### 🔵 RECHERCHE MANUELLE PRIORITAIRE (3)
 
-Les leads "Nouveau" restent en état tant que l'enrichissement n'a pas fourni d'email vérifié.
+| # | Entreprise | Pourquoi | Source |
+|---|------------|----------|--------|
+| 1 | **DBV Technologies** | Phase 3 VITESSE positive déc 2025, BLA soumis H1 2026, cotée Nasdaq+Euronext, levée $116M | Site corporate, LinkedIn CEO Daniel Tassé, relations investisseurs |
+| 2 | **HighLife** | CE mark obtenu janvier 2026, FDA Breakthrough Device avril 2025, marché $10B valve mitrale | Site, LinkedIn CEO Stefan Pilz, congrès cardiologie |
+| 3 | **Oncovita** | FDA Orphan Drug Designation juin 2025, essais cliniques 2026, spin-off Institut Pasteur | LinkedIn CEO Stéphane Altaba, Institut Pasteur |
+
+→ **Action**: Recherche manuelle agressive (LinkedIn, site corporate, presse)
+
+---
+
+### 🟢 ENRICHISSEMENT AUTOMATIQUE (10)
+
+| # | Entreprise | Domaine | Statut | Source à utiliser |
+|---|------------|---------|--------|-------------------|
+| 1 | PDCline Pharma | pdc-line.com | Thérapies cellulaires cancer | Hunter.io + site |
+| 2 | POXEL | poxelinc.com | Biotech cotée Euronext | Site IR + LinkedIn |
+| 3 | Qubit Pharmaceuticals | qubitpharma.com | Drug discovery AI | Hunter + site + Crunchbase |
+| 4 | Advanced BioDesign | advancedbiodesign.fr | Anticorps thérapeutiques | Hunter + site |
+| 5 | Caranx Medical | caranxmedical.com | Medtech cardiovasculaire | Hunter + site |
+| 6 | Lovaltech | lovaltech.com | Biotech bioproduction | Hunter + site |
+| 7 | BioMAdvanced Diagnostics | biomadvanced.com | Diagnostic | Hunter + site |
+| 8 | SURGAR | surgar.fr | Biotech | Hunter + site |
+| 9 | Spade | spade-medical.com | Medical | Hunter + site |
+| 10 | Sonio | sonio.co | MedTech | Hunter + site |
+
+→ **Action**: Lancer `--enrich` sur ces 10 en priorité
+
+---
+
+## Plan d'action concrètes
+
+### IMMÉDIAT (cette semaine)
+
+1. **Lancer enrichissement auto** sur les 10 leads du groupe vert
+   ```bash
+   python3 run.py --enrich
+   ```
+
+2. **Recherche manuelle DBV Technologies**
+   - CEO: Daniel Tassé (LinkedIn)
+   - Contact IR: investor@dbv-technologies.com
+   - Contexte: BLA soumise, présentation AAAAI 2026, levée $116M en 2025
+
+3. **Recherche manuelle HighLife**
+   - CEO: Stefan Pilz (LinkedIn)
+   - Contact: contact@highlifemedical.com
+   - Contexte: CE mark janvier 2026, FDA IDE approved, premier commercialisation Europe
+
+4. **Recherche manuelle Oncovita**
+   - CEO: Stéphane Altaba (LinkedIn)
+   - Contact: contact@oncovita.fr
+   - Contexte: FDA Orphan Drug 2025, essai clinique 2026
+
+### SI RIEN NE MARCHE (semaine 2)
+
+- Re-scraper avec sources alternatives (Maddyness, France Biotech)
+- Contact direct via LinkedIn (pas d'email, juste DM)
 
 ---
 
 ## Notes
 
-- Les autres leads sans email comme Spade, Sonio, BioMAdvanced et SURGAR restent en priorité B/C
-- Les 5 leads sans domaine sont à ignorer ou à vérifier manuellement
+- Les 6 leads "hors scope" doivent être exclus du pipeline de prospection active
+- DBV, HighLife, Oncovita sont les 3 meilleures opportunités restantes - investir du temps manuel
+- Les 10 autres sont des leads corrects mais moins stratégiques
+
+---
+
+## Suivi
+
+| Date | Action | Résultat |
+|------|--------|-----------|
+| 2026-05-09 | Analyse classification | 6 hors scope, 3 manuels, 10 auto |
