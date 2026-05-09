@@ -45,6 +45,51 @@
 
 ---
 
+### 🟡 RÉSULTATS RECHERCHE MANUELLE (2026-05-10)
+
+#### DBV Technologies ✅ EMAIL TROUVÉ
+| Champ | Valeur |
+|-------|--------|
+| Contact | Katie Matthews |
+| Poste | Senior Director, Investor Relations & Strategy |
+| Email | katie.matthews@dbvtechnologies.com |
+| Source | Communiqué presse officiel Nasdaq, site corporate |
+| Confiance | **Haute** - contact IR officiel, répond aux questions investisseurs |
+| Pattern email | `{prenom.nom}@dbv-technologies.com` |
+
+Autres contacts identifiés (non utilisés) :
+- brett.whelan@dbv-technologies.com (Media)
+- angela.marcucci@dbv-technologies.com (Media)
+- jonathan.neely@dbv-technologies.com (IR)
+
+#### HighLife ⚠️ SANS EMAIL CONFIANT
+| Champ | Valeur |
+|-------|--------|
+| Contact | Stefan Pilz |
+| Poste | CEO (depuis août 2024) |
+| Domaine | highlifemedical.com |
+| Email trouvés | info@highlifemed.com (générique mentions légales) |
+| Source | Site mentions légales |
+| Confiance | **Faible** - email générique, pas de contact direct |
+| Pattern probable | stefan.pilz@highlifemedical.com |
+
+**Note** : CEO avec profil commercial fort (ex-Abiomed, J&J). Privilégier LinkedIn DM plutôt qu'email.
+
+#### Oncovita ⚠️ SANS EMAIL CONFIANT
+| Champ | Valeur |
+|-------|--------|
+| Contact | Stéphane Altaba |
+| Poste | CEO (depuis octobre 2024) |
+| Domaine | oncovita.fr |
+| Email trouvés | contact@oncovita.fr (générique) |
+| Source | Site contact |
+| Confiance | **Faible** - email générique, pas de contact direct |
+| Pattern probable | stephane.altaba@oncovita.fr |
+
+**Note** :CEO avec historique Sanofi/Nordic Pharma. Email IR possible mais non publié.
+
+---
+
 ### 🟢 ENRICHISSEMENT AUTOMATIQUE (10)
 
 | # | Entreprise | Domaine | Statut | Source à utiliser |
@@ -108,3 +153,4 @@
 | Date | Action | Résultat |
 |------|--------|-----------|
 | 2026-05-09 | Analyse classification | 6 hors scope, 3 manuels, 10 auto |
+| 2026-05-10 | Recherche manuelle DBV/HighLife/Oncovita | DBV: katie.matthews@dbvtechnologies.com (IR) ✓ |
