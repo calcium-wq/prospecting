@@ -10,3 +10,5 @@ crunchbase-scraper/
 fire-enrich/
 sales-outreach/
 theHarvester/
+
+data/pending_emails.json

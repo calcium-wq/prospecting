@@ -16,6 +16,7 @@ Usage:
 import sys
 import argparse
 import time
+import json
 from pathlib import Path
 from datetime import date
 
@@ -59,6 +60,7 @@ PRENOM_CORRECTIONS: dict[str, tuple[str, str]] = {
 NOTIFY_PRENOM = {}
 
 _pending_emails: list[dict] = []
+PENDING_EMAILS_PATH = DATA_DIR / "pending_emails.json"
 
 
 def step_scrape(max_leads: int = 9999) -> list[dict]:
@@ -321,6 +323,13 @@ def step_send_emails(dry_run: bool = False):
 def _confirm_and_send():
     """Attend confirmation de l'utilisateur avant d'envoyer les emails en attente."""
     global _pending_emails
+    if not _pending_emails and PENDING_EMAILS_PATH.exists():
+        try:
+            _pending_emails = json.loads(PENDING_EMAILS_PATH.read_text(encoding="utf-8"))
+            print(f"[Send] Emails charg?s depuis la preview valid?e : {PENDING_EMAILS_PATH}")
+        except Exception as e:
+            log_error("run.py", e, "load pending emails")
+
     if not _pending_emails:
         print("[Send] Aucun email en attente. Lancez --preview d'abord.")
         return
