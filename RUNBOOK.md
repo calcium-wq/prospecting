@@ -125,6 +125,11 @@ Tape `oui` (ou `o`) pour envoyer.
 
 Un lead chaud = quelqu'un qui a répondu positivement (notifié par Telegram ou détecté dans Gmail).
 
+Contrainte de planning importante :
+- Edgar est etudiant.
+- Proposer les calls surtout lundi matin, lundi apres 17h30, les soirs de semaine apres 18h30, ou le week-end.
+- Eviter les propositions de rendez-vous en pleine journee de semaine.
+
 ### Étape A : Identifier le lead
 
 ```bash

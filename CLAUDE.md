@@ -165,10 +165,16 @@ step_monitor_replies→ Vérifie Gmail IMAP, traite réponses, notifie Telegram
    "Bonjour [Prénom],
    Merci pour votre retour — ravi que ça résonne.
    Je vous propose un appel de 15 min cette semaine pour voir si je peux vous aider concrètement.
-   Vous êtes disponible jeudi ou vendredi en fin de matinée ?
+   Vous auriez un créneau en fin de journée cette semaine, ou sinon ce week-end ?
    — Edgar"
 3. Mettre statut Notion → "Call planifié"
 4. Notification Telegram automatique déjà active
+
+### Disponibilités d'Edgar
+- Edgar est étudiant.
+- Proposer les calls surtout lundi matin, lundi après 17h30, les soirs de semaine après 18h30, ou le week-end.
+- Éviter les propositions de rendez-vous en pleine journée de semaine.
+- Fuseau horaire par défaut : Europe/Paris.
 
 ### Notifications Telegram
 - Token dans .env sous TELEGRAM_BOT_TOKEN

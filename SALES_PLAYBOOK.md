@@ -2,6 +2,22 @@
 
 Objectif : transformer une reponse positive en call, puis en devis simple a 3000-5000 euros.
 
+## Contrainte de disponibilite
+
+Edgar est etudiant.
+
+Disponibilites par defaut a proposer pour un call :
+- lundi matin ;
+- lundi apres 17h30 ;
+- mardi a vendredi apres 18h30 ;
+- week-end.
+
+Fuseau horaire : Europe/Paris.
+
+Regle absolue :
+- ne pas proposer par defaut un call en pleine journee de semaine.
+- si possible, proposer "fin de journee en semaine ou week-end" plutot que "jeudi/vendredi fin de matinee".
+
 ---
 
 ## 1. Quand un prospect repond positivement
@@ -17,9 +33,9 @@ Bonjour [Prenom],
 
 Merci pour votre retour, ravi que ca resonne.
 
-Je vous propose un appel de 15 min cette semaine pour comprendre votre technologie, voir ou une animation 3D peut aider, et vous dire frankly si je peux vous etre utile.
+Je vous propose un appel de 15 min cette semaine pour comprendre votre technologie, voir ou une animation 3D peut aider, et vous dire franchement si je peux vous etre utile.
 
-Vous etes disponible jeudi ou vendredi en fin de matinee ?
+Vous auriez un creneau en fin de journee cette semaine, ou sinon ce week-end ?
 
 -- Edgar
 ```
@@ -49,7 +65,7 @@ Oui, je peux vous montrer un exemple de style. Voici le lien : [LIEU VERS DEMO]
 
 Le plus pertinent reste de prendre 15 min pour comprendre votre mecanisme exact, puis je peux vous proposer un mini storyboard adapte a votre technologie. Ca vous permettrait de voir exactement ce que ca donnerait pour votre cas.
 
-Vous avez 15 min cette semaine ?
+Vous auriez un creneau en fin de journee cette semaine, ou sinon ce week-end ?
 
 -- Edgar
 ```
@@ -74,7 +90,7 @@ Pour vous donner une idee plus precise, j aurais besoin de comprendre :
 
 Ces 3 elements me permettent de you propose un scope adapte.
 
-On en parle en 15 min ?
+Un rapide echange en fin de journee cette semaine, ou ce week-end, serait-il possible ?
 
 -- Edgar
 ```
@@ -213,6 +229,13 @@ L'objectif est de vous livrer un support clair, exploitable rapidement, sans par
 ## 5. Envoi du devis apres call
 
 **Delai max : 2h apres le call.**
+
+## Doctrine business
+
+- Automatiser toute la prospection jusqu'a la premiere reponse du prospect.
+- Ne jamais envoyer de reponse commerciale chaude a la place d'Edgar.
+- Le systeme peut envoyer emails initiaux, relances, monitoring et notifications.
+- Des qu'un prospect repond, Edgar reprend la main.
 
 ```
 Objet: Proposition animation 3D - [Nom de la boite]
