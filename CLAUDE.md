@@ -309,6 +309,7 @@ Ces erreurs sont interdites dans tous les emails générés (initial + relances)
 ## Conversion commerciale
 
 Quand un prospect répond positivement, utiliser `SALES_PLAYBOOK.md`.
+Si le prospect demande un exemple ou un portfolio, utiliser `PORTFOLIO_DEMO_BRIEF.md`.
 
 Priorité business :
 - répondre dans les 2h ;

@@ -438,6 +438,7 @@ tail -10 ~/prospecting/data/followup.log
 ## Conversion d'un prospect intéressé
 
 Quand un prospect répond positivement, ouvrir `SALES_PLAYBOOK.md`.
+Si le prospect demande un exemple, ouvrir `PORTFOLIO_DEMO_BRIEF.md`.
 
 Objectif immédiat :
 - répondre dans les 2h ;
