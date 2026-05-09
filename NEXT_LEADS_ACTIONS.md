@@ -168,3 +168,19 @@ Autres contacts identifiés (non utilisés) :
 | 2026-05-09 | Analyse classification | 6 hors scope, 3 manuels, 10 auto |
 | 2026-05-10 | Recherche DBV/HighLife/Oncovita | DBV: katie.matthews@dbvtechnologies.com (IR) ✓ |
 | 2026-05-10 | Recherche 5 leads supplémentaires | POXEL + Lovaltech ajoutés (2/5) |
+| 2026-05-10 | Recherche 10 leads restants | Qubit + Caranx(Affluent) ajoutés (2/10) |
+
+### 🟡 RÉSULTATS RECHERCHE 10 LEADSSUPPLEMENTAIRES (2026-05-10)
+
+| # | Entreprise | Résultat | Contact | Email | Confiance |
+|---|------------|----------|---------|-------|-----------|
+| 1 | Qubit Pharmaceuticals | ✅ Probable | Robert Marino (CEO) | robert.marino@qubit-pharmaceuticals.com | Moyenne |
+| 2 | Caranx Medical (Acquis) | ✅ Via母公司 | Jerome Geoffroy (IR Affluent) | jerome.geoffroy@affluentmedical.com | Moyenne |
+| 3 | PDCline Pharma | ❌ Générique | Eric Halioua (CEO) | contact@pdc-line-pharma.com | Faible |
+| 4 | Spade | ❌ Blocqué | - | spade@spade-equipements.com | Faible |
+| 5 | Sonio | ❌ Blocqué | Formulaire only | - | Faible |
+| 6 | BioMAdvanced Diagnostics | ❌ Pas d'info | - | - | Faible |
+| 7 | SURGAR | ❌ Pas d'info | - | - | Faible |
+| 8 | HighLife | ❌ Déjà fait | Stefan Pilz (CEO) | info@highlifemed.com | Faible |
+| 9 | Advanced BioDesign | ❌ Déjà fait | - | contact@a-biodesign.com | Faible |
+| 10 | Oncovita | ❌ Déjà fait | Stéphane Altaba (CEO) | contact@oncovita.fr | Faible |
