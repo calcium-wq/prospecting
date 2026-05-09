@@ -73,9 +73,8 @@ def step_scrape(max_leads: int = 9999) -> list[dict]:
 
 
 def step_enrich():
-    """Étape 2 : Enrichissement emails + scraping LinkedIn URL."""
+    """Étape 2 : Enrichissement emails."""
     from modules.email_enricher import enrich_lead, extract_prenom_from_email
-    from modules.scraper import find_linkedin_url
     from modules.leads_csv import save_leads
     print("\n" + "="*60)
     print("ÉTAPE 2 — ENRICHISSEMENT EMAILS + LINKEDIN")
@@ -108,44 +107,8 @@ def step_enrich():
                 except Exception as e:
                     log_error("run.py", e, f"enrich {row.get('domaine', '')}")
 
-        print(f"\n[LinkedIn] Scraping URLs pour {len(df)} leads...")
-        for idx, row in df.iterrows():
-            current_url = str(row.get("linkedin_url", "")).strip()
-            if current_url:
-                continue
-
-            email = str(row.get("email", "")).strip()
-            boite = str(row.get("boite", "")).strip()
-
-            if not email:
-                continue
-
-            if is_generic_email(email):
-                continue
-
-            correction = PRENOM_CORRECTIONS.get(email)
-            if correction:
-                prenom, nom = correction
-            else:
-                prenom = str(row.get("prenom", "")).strip()
-                nom = str(row.get("nom", "")).strip()
-                if prenom.lower() in {"fondateur", "founder", "contact", "ceo", ""}:
-                    continue
-
-            if not nom:
-                nom = ""
-
-            print(f"[LinkedIn] {boite}: {prenom} {nom}...")
-            li_url = find_linkedin_url(prenom, nom, boite)
-            if li_url:
-                df.loc[idx, "linkedin_url"] = li_url
-                print(f"         → {li_url}")
-            else:
-                print(f"         → non trouvé")
-
-            import time
-            time.sleep(1)
-
+        # LinkedIn scraping désactivé — 0 résultats en pratique, ralentit massivement le pipeline
+        # Réactiver quand linkedin_url sera disponible directement dans les leads scrappés
         save_leads(df)
     except Exception as e:
         log_error("run.py", e, "step_enrich")
@@ -393,22 +356,37 @@ def step_linkedin():
 
 
 def step_monitor_replies():
-    """Étape 6 : Vérification des réponses Gmail."""
+    """Étape 6 : Vérification des réponses Gmail + résumé quotidien Telegram."""
     from modules.gmail_monitor import check_replies, process_replies
-    from modules.telegram_notif import notify_hot_lead
+    from modules.telegram_notif import notify_hot_lead, send_daily_summary
+    from modules.leads_csv import load_leads
     print("\n" + "="*60)
     print("ÉTAPE 6 — SURVEILLANCE RÉPONSES GMAIL")
     print("="*60)
+    hot_count = 0
     try:
         replies = check_replies()
         if not replies:
             print("[GmailMonitor] Aucune nouvelle réponse détectée")
-            return
-        print(f"[GmailMonitor] {len(replies)} réponse(s) détectée(s)")
-        process_replies(replies, notify_fn=notify_hot_lead)
+        else:
+            print(f"[GmailMonitor] {len(replies)} réponse(s) détectée(s)")
+            hot_count = process_replies(replies, notify_fn=notify_hot_lead) or 0
     except Exception as e:
         log_error("run.py", e, "step_monitor_replies")
         print(f"[GmailMonitor] ERREUR : {e} — continuation...")
+
+    try:
+        df = load_leads()
+        stats = {
+            "sent": int((df["statut"] == "Email envoyé").sum()),
+            "replies": int(df["reponse"].notna().sum()),
+            "followups_due": int((df["statut"] == "Relancé").sum()),
+            "no_email": int((df["email"].fillna("") == "").sum()),
+            "hot": hot_count,
+        }
+        send_daily_summary(stats)
+    except Exception as e:
+        log_error("run.py", e, "send_daily_summary")
 
 
 def test_all_components():
