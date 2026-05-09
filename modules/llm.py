@@ -198,16 +198,22 @@ NARRATIF: raconte un micro-résultat (pas "j'ai animé", plutôt "j'ai fait un v
 
 
 def generate_followup_j14(company_name: str, prenom: str) -> dict:
-    """Break-up email J+14 - derniers mots, sans pression."""
-    system = """Tu es Edgar. Dernier email, 1 phrase, 10-15 mots max.
+    """Break-up email J+14 - derniers mots, sans pression, naturel."""
+    system = """Tu es Edgar. Dernier email de la séquence, naturel et bienveillant, 10-15 mots max.
 RÈGLES ABSOLUES — INTERDIT :
 - Pas "je ferme le dossier" (robotique)
 - Pas "je reste disponible" (cliché)
+- Pas "ok, on se refuse" (maladroit)
+- Pas "pour être concret" (daté)
 - Pas de faute de conjugaison
+- Pas de question condescendante "Avez-vous déjà envisagé"
 - La question finale DOIT mener vers un call de 15 min
-Ton naturel: court et bienveillant, genre "ok, on se refuse. Je suis là si besoin."""
+Ton naturel: "Je ne vous relance pas davantage. Si le sujet devient utile plus tard, je serai ravi d'en discuter." ou similaire, bienveillant sans pression."""
 
-    context = f"Destinataire: {prenom},entreprise: {company_name}\n\nGénère un message de clôture hyper-court."
+    context = f"Destinataire: {prenom},entreprise: {company_name}\n\nGénère un message de clôture naturel et court."
 
     result = invoke_llm(system, context, max_tokens=50)
-    return {"subject": f"Re: {company_name}", "body": result.strip()}
+    body = result.strip()
+    if "-- Edgar" not in body:
+        body += "\n\n— Edgar"
+    return {"subject": f"Re: {company_name}", "body": body}

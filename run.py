@@ -610,7 +610,70 @@ def step_followups():
         run_followups()
     except Exception as e:
         log_error("run.py", e, "step_followups")
-        print(f"[Followup] ERREUR : {e} — continuation...")
+
+
+def step_followup_preview():
+    """Aperçu des relances dues aujourd'hui sans envoyer."""
+    from modules.gmail_monitor import check_replies, process_replies
+    from modules.followup import get_followups_due_today, validate_followup
+    from modules.llm import generate_followup_j3, generate_followup_j7, generate_followup_j14
+    from modules.leads_csv import load_leads
+    print("\n" + "="*60)
+    print("PRÉVIEW RELANCES — AUCUN ENVOI")
+    print("="*60)
+
+    print("\n[Gmail] Vérification des réponses...")
+    try:
+        replies = check_replies()
+        if replies:
+            print(f"[Gmail] {len(replies)} réponse(s) détectée(s)")
+            process_replies(replies)
+    except Exception as e:
+        log_error("run.py", e, "followup_preview check_replies")
+
+    df = load_leads()
+    responded = set(df[df["reponse"].fillna("").astype(str).str.strip() != ""]["email"].dropna().values)
+    dnc = set(df[df["dnc"].fillna("").astype(str).str.strip().lower() == "true"]["email"].dropna().values)
+
+    due = get_followups_due_today()
+    total_preview = 0
+    for day in [3, 7, 14]:
+        leads = due.get(day, [])
+        if not leads:
+            print(f"\n[J+{day}] Aucune relance")
+            continue
+        print(f"\n{'='*40}")
+        print(f"J+{day} — {len(leads)} relance(s) due(s)")
+        print("="*40)
+        for lead in leads:
+            email = lead.get("email", "")
+            prenom = lead.get("prenom", "")
+            boite = lead.get("boite", "")
+
+            if email in responded:
+                print(f"  SKIP (a répondu): {email}")
+                continue
+            if email in dnc:
+                print(f"  SKIP (DNC): {email}")
+                continue
+
+            if day == 3:
+                content = generate_followup_j3(boite, prenom)
+            elif day == 7:
+                content = generate_followup_j7(boite, prenom)
+            else:
+                content = generate_followup_j14(boite, prenom)
+
+            is_valid, error, _ = validate_followup(content.get("body", ""))
+            status = "OK" if is_valid else f"ÉCHOUÉE: {error}"
+            print(f"\n--- {boite} ({email}) [{status}] ---")
+            print(f"Objet: {content.get('subject', '')}")
+            print(f"Corps: {content.get('body', '')}")
+            total_preview += 1
+
+    print(f"\n{'='*60}")
+    print(f"Total relances à envoyer: {total_preview}")
+    print("="*60)
 
 
 def step_linkedin():
@@ -805,6 +868,7 @@ def main():
     parser.add_argument("--preview", action="store_true", help="Génère et affiche les emails pour validation")
     parser.add_argument("--send", action="store_true", help="Envoi emails (après --preview ou seul)")
     parser.add_argument("--followup", action="store_true", help="Relances uniquement")
+    parser.add_argument("--followup-preview", action="store_true", help="Aperçu relances sans envoyer")
     parser.add_argument("--linkedin", action="store_true", help="LinkedIn uniquement")
     parser.add_argument("--monitor", action="store_true", help="Surveillance réponses Gmail")
     parser.add_argument("--test", action="store_true", help="Test tous les composants")
@@ -834,6 +898,8 @@ def main():
         _confirm_and_send()
     elif args.followup:
         step_followups()
+    elif args.followup_preview:
+        step_followup_preview()
     elif args.linkedin:
         step_linkedin()
     elif args.monitor:
