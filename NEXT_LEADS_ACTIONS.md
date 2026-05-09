@@ -90,20 +90,33 @@ Autres contacts identifiés (non utilisés) :
 
 ---
 
-### 🟢 ENRICHISSEMENT AUTOMATIQUE (10)
+### 🟡 RÉSULTATS RECHERCHE 5 LEADSSUPPLEMENTAIRES (2026-05-10)
+
+| # | Entreprise | Résultat | Contact | Email | Confiance |
+|---|------------|----------|---------|-------|-----------|
+| 1 | **POXEL** | ✅ Trouvé | Investor Relations | investors@poxelpharma.com | Haute |
+| 2 | **Qubit Pharmaceuticals** | ⚠️ Possible | Robert Marino (CEO) | robermarino@qubit-pharma.com (probable) | Moyenne |
+| 3 | **PDCline Pharma** | ❌ Générique | Eric Halioua (CEO) | contact@pdc-line-pharma.com | Faible |
+| 4 | **Advanced BioDesign** | ❌ Générique | Contact form | contact@a-biodesign.com | Faible |
+| 5 | **Lovaltech** | ✅ Trouvé | Alix Lassin (Com) | alix.lassin.cnum@lovaltechnology.com | Moyenne |
+
+**Emails ajoutés à leads.csv** : POXEL, Lovaltech (confidence suffisante)
+**Non ajoutés** : Qubit (trop incertain), PDCline, Advanced BioDesign (trop génériques)
+
+---
+
+### 🟢 ENRICHISSEMENT AUTOMATIQUE (8)
 
 | # | Entreprise | Domaine | Statut | Source à utiliser |
 |---|------------|---------|--------|-------------------|
 | 1 | PDCline Pharma | pdc-line.com | Thérapies cellulaires cancer | Hunter.io + site |
-| 2 | POXEL | poxelinc.com | Biotech cotée Euronext | Site IR + LinkedIn |
-| 3 | Qubit Pharmaceuticals | qubitpharma.com | Drug discovery AI | Hunter + site + Crunchbase |
-| 4 | Advanced BioDesign | advancedbiodesign.fr | Anticorps thérapeutiques | Hunter + site |
-| 5 | Caranx Medical | caranxmedical.com | Medtech cardiovasculaire | Hunter + site |
-| 6 | Lovaltech | lovaltech.com | Biotech bioproduction | Hunter + site |
-| 7 | BioMAdvanced Diagnostics | biomadvanced.com | Diagnostic | Hunter + site |
-| 8 | SURGAR | surgar.fr | Biotech | Hunter + site |
-| 9 | Spade | spade-medical.com | Medical | Hunter + site |
-| 10 | Sonio | sonio.co | MedTech | Hunter + site |
+| 2 | Qubit Pharmaceuticals | qubitpharma.com | Drug discovery AI | Hunter + site + Crunchbase |
+| 3 | Advanced BioDesign | advancedbiodesign.fr | Anticorps thérapeutiques | Hunter + site |
+| 4 | Caranx Medical | caranxmedical.com | Medtech cardiovasculaire | Hunter + site |
+| 5 | BioMAdvanced Diagnostics | biomadvanced.com | Diagnostic | Hunter + site |
+| 6 | SURGAR | surgar.fr | Biotech | Hunter + site |
+| 7 | Spade | spade-medical.com | Medical | Hunter + site |
+| 8 | Sonio | sonio.co | MedTech | Hunter + site |
 
 → **Action**: Lancer `--enrich` sur ces 10 en priorité
 
@@ -153,4 +166,5 @@ Autres contacts identifiés (non utilisés) :
 | Date | Action | Résultat |
 |------|--------|-----------|
 | 2026-05-09 | Analyse classification | 6 hors scope, 3 manuels, 10 auto |
-| 2026-05-10 | Recherche manuelle DBV/HighLife/Oncovita | DBV: katie.matthews@dbvtechnologies.com (IR) ✓ |
+| 2026-05-10 | Recherche DBV/HighLife/Oncovita | DBV: katie.matthews@dbvtechnologies.com (IR) ✓ |
+| 2026-05-10 | Recherche 5 leads supplémentaires | POXEL + Lovaltech ajoutés (2/5) |
