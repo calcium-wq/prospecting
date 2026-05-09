@@ -25,6 +25,8 @@ _HTTP_TIMEOUT = 10
 _EHLO_DOMAIN = "gmail.com"
 _GENERIC_PREFIXES = {"contact", "hello", "info", "bonjour", "contact-us", "support", "admin", "noreply", "no-reply", "sales", "marketing", "team", "equipe", "service"}
 
+_harvester_cache: dict[str, list[str]] = {}
+
 _ABOUT_PATHS = ["/team", "/about", "/about-us", "/equipe", "/founders", "/leadership"]
 _CONTACT_PATHS = ["/contact", "/contact-us", "/nous-contacter", "/contactez-nous", "/"]
 
@@ -178,6 +180,8 @@ def _is_domain_email(email: str, domain: str) -> bool:
 # ---------------------------------------------------------------------------
 
 def _run_harvester(domain: str) -> list[str]:
+    if domain in _harvester_cache:
+        return _harvester_cache[domain]
     try:
         result = subprocess.run(
             ["theHarvester", "-d", domain, "-b", "google,bing,duckduckgo", "-l", "50"],
@@ -186,12 +190,14 @@ def _run_harvester(domain: str) -> list[str]:
         )
         output = result.stdout + result.stderr
         emails = re.findall(r"[\w.+\-]+@" + re.escape(domain), output, re.IGNORECASE)
-        return list({e.lower() for e in emails})
+        found = list({e.lower() for e in emails})
     except subprocess.TimeoutExpired:
-        return []
+        found = []
     except Exception as e:
         log_error("email_enricher", e, f"harvester {domain}")
-        return []
+        found = []
+    _harvester_cache[domain] = found
+    return found
 
 
 # ---------------------------------------------------------------------------
