@@ -23,7 +23,7 @@ from modules.logger import log_error
 _HARVESTER_TIMEOUT = 90
 _HTTP_TIMEOUT = 10
 _EHLO_DOMAIN = "gmail.com"
-_GENERIC_PREFIXES = {"contact", "hello", "info", "bonjour", "contact-us"}
+_GENERIC_PREFIXES = {"contact", "hello", "info", "bonjour", "contact-us", "support", "admin", "noreply", "no-reply", "sales", "marketing", "team", "equipe", "service"}
 
 _ABOUT_PATHS = ["/team", "/about", "/about-us", "/equipe", "/founders", "/leadership"]
 _CONTACT_PATHS = ["/contact", "/contact-us", "/nous-contacter", "/contactez-nous", "/"]
