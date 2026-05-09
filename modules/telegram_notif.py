@@ -31,6 +31,18 @@ def notify_hot_lead(prenom: str, boite: str, email: str = ""):
         print(f"[Telegram] Notification envoyée pour {prenom} ({boite})")
     return success
 
+def send_daily_summary(stats: dict) -> bool:
+    """Envoie un résumé quotidien des stats de prospection."""
+    msg = (
+        "📊 Résumé quotidien prospection\n"
+        f"✉️ Emails envoyés : {stats.get('sent', 0)}\n"
+        f"📬 Réponses reçues : {stats.get('replies', 0)}\n"
+        f"🔄 Relances dues aujourd'hui : {stats.get('followups_due', 0)}\n"
+        f"❌ Sans email : {stats.get('no_email', 0)}\n"
+        f"🔥 Leads chauds : {stats.get('hot', 0)}"
+    )
+    return send_telegram(msg)
+
 def test_connection() -> bool:
     """Test Telegram bot connectivity."""
     return send_telegram("✅ Bot Telegram connecté — pipeline prospection actif.")
