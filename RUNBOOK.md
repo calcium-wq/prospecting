@@ -435,6 +435,20 @@ tail -10 ~/prospecting/data/followup.log
 
 ---
 
+## Conversion d'un prospect intéressé
+
+Quand un prospect répond positivement, ouvrir `SALES_PLAYBOOK.md`.
+
+Objectif immédiat :
+- répondre dans les 2h ;
+- obtenir un call de 15 min ;
+- comprendre le mécanisme à expliquer, l'audience et la deadline ;
+- proposer une animation courte entre 3000 et 5000 euros selon complexité.
+
+Ne pas improviser le pricing en live : utiliser le cadrage du playbook.
+
+---
+
 ## Contacts de référence
 
 - **OpenRouter API** : https://openrouter.ai/keys

@@ -241,7 +241,9 @@ relance_j3, relance_j7, relance_j14,
 reponse, dnc, notes
 ```
 
-État actuel : 85 leads, 19 avec email, 66 sans email. Tous sont à "Nouveau" — aucune action encore envoyée.
+État actuel au 2026-05-09 soir : 85 leads total, 66 avec email, 19 sans email.
+45 emails ont été envoyés, 21 leads sont en DNC, 19 leads restent "Nouveau" sans email.
+Aucun lead n'est encore en "A verifier".
 
 ## scrape_pipeline.py — Script autonome
 
@@ -303,3 +305,14 @@ Ces erreurs sont interdites dans tous les emails générés (initial + relances)
 - Respecter les rate limits : 100 emails/jour, 130 LinkedIn/mois
 - Tout ce qui est envoyé doit être loggé dans Notion avec timestamp
 - Les relances passent toujours par llm.py (génération LLM), pas par des templates hardcodés
+
+## Conversion commerciale
+
+Quand un prospect répond positivement, utiliser `SALES_PLAYBOOK.md`.
+
+Priorité business :
+- répondre dans les 2h ;
+- proposer un call de 15 min ;
+- qualifier le besoin réel ;
+- cadrer une offre simple entre 3000 et 5000 euros ;
+- vendre la clarté et l'impact business, pas "de la 3D" abstraite.
