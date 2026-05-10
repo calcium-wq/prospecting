@@ -403,6 +403,34 @@ def step_import_premium():
         return []
 
 
+def step_expand_graph(max_leads: int = 25):
+    """Etend la recherche biotech en suivant les liens d'écosystème."""
+    from modules.scraper import expand_biotech_graph
+
+    print("\n" + "=" * 60)
+    print("ETAPE 1C - EXPANSION GRAPHE ECOSYSTEME")
+    print("=" * 60)
+    try:
+        df = load_leads()
+        seed_leads = df.to_dict("records")
+        new_leads = expand_biotech_graph(seed_leads, max_new=max_leads)
+        if not new_leads:
+            print("[GraphExpand] Aucun nouveau lead trouve")
+            return []
+
+        added = 0
+        for lead in new_leads:
+            if add_lead(lead):
+                added += 1
+
+        print(f"[GraphExpand] {added}/{len(new_leads)} leads ajoutes")
+        return new_leads
+    except Exception as e:
+        log_error("run.py", e, "step_expand_graph")
+        print(f"[GraphExpand] ERREUR : {e}")
+        return []
+
+
 def step_enrich():
     """Etape 2 : enrichissement emails."""
     from modules.email_enricher import enrich_lead, extract_prenom_from_email
@@ -1083,6 +1111,7 @@ def main():
     parser = argparse.ArgumentParser(description="Pipeline de prospection B2B — Edgar Frinis")
     parser.add_argument("--scrape", action="store_true", help="Scraping startups uniquement")
     parser.add_argument("--import-premium", action="store_true", help="Importe les leads premium curates depuis NEW_LEADS_PIPELINE.md")
+    parser.add_argument("--expand-graph", action="store_true", help="Etend les leads via le graphe d'ecosysteme biotech")
     parser.add_argument("--enrich", action="store_true", help="Enrichissement emails uniquement")
     parser.add_argument("--preview", action="store_true", help="Génère et affiche les emails pour validation")
     parser.add_argument("--send", action="store_true", help="Envoi emails (après --preview ou seul)")
@@ -1111,6 +1140,8 @@ def main():
         step_scrape(args.max_leads)
     elif args.import_premium:
         step_import_premium()
+    elif args.expand_graph:
+        step_expand_graph(args.max_leads)
     elif args.enrich:
         step_enrich()
     elif args.preview:

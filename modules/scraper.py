@@ -9,9 +9,11 @@ Sources (dans l'ordre de priorité) :
 """
 import re
 import time
+from collections import deque
 from pathlib import Path
 
 import requests
+import urllib3
 from bs4 import BeautifulSoup
 from modules.config import TARGET_SECTOR, BASE_DIR
 from modules.logger import log_error
@@ -23,6 +25,7 @@ HEADERS = {
         "Chrome/120.0.0.0 Safari/537.36"
     )
 }
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ─── Boîtes françaises biotech/medtech/healthtech connues ─────────────────────
 # Format : (nom_boite, domaine, secteur, stade)
@@ -83,14 +86,364 @@ STATIC_LEADS = [
 ]
 
 CURATED_PREMIUM_PIPELINE = BASE_DIR / "NEW_LEADS_PIPELINE.md"
+ECOSYSTEM_ORG_SEEDS = [
+    {"node_type": "org", "name": "Elaia", "domain": "elaia.com", "relation_type": "investor", "url": "https://www.elaia.com/portfolio/"},
+    {"node_type": "org", "name": "Andera Partners", "domain": "anderapartners.com", "relation_type": "investor", "url": "https://www.anderapartners.com/"},
+    {"node_type": "org", "name": "Sofinnova Partners", "domain": "sofinnovapartners.com", "relation_type": "investor", "url": "https://www.sofinnovapartners.com/portfolio/"},
+    {"node_type": "org", "name": "SATT Paris-Saclay", "domain": "satt-paris-saclay.fr", "relation_type": "incubator", "url": "https://www.satt-paris-saclay.fr/"},
+    {"node_type": "org", "name": "iBionext", "domain": "ibionext.com", "relation_type": "incubator", "url": "https://www.ibionext.com/"},
+]
+GRAPH_RELATION_QUERIES = [
+    ("investor", '"{company}" investisseurs biotech france'),
+    ("investor", '"{company}" series a investor france'),
+    ("incubator", '"{company}" incubateur sante france'),
+    ("program", '"{company}" france 2030 bpifrance'),
+    ("partner", '"{company}" partenaire biotech medtech'),
+    ("spinout", '"{company}" spin-off sante france'),
+]
+GRAPH_ORG_PAGE_PATHS = [
+    "/portfolio",
+    "/companies",
+    "/startups",
+    "/portfolio-companies",
+    "/investments",
+    "/members",
+    "/ecosystem",
+    "/startups-portfolio",
+    "/participations",
+]
+GRAPH_COMPANY_PAGE_PATHS = [
+    "/",
+    "/about",
+    "/about-us",
+    "/news",
+    "/press",
+    "/company",
+]
+GRAPH_STOP_DOMAINS = {
+    "linkedin.com", "facebook.com", "instagram.com", "x.com", "twitter.com",
+    "youtube.com", "wikipedia.org", "maddyness.com", "france-biotech.fr",
+    "lemonde.fr", "lesechos.fr", "bfmtv.com", "euronext.com", "globenewswire.com",
+    "businesswire.com", "prnewswire.com", "medium.com", "welcomekit.co", "sifted.eu", "tech.eu",
+}
+GRAPH_ORG_HINTS = {
+    "vc", "ventures", "capital", "partners", "partner", "partnerships", "seed", "series a",
+    "incubator", "accelerator", "satt", "bpifrance", "france 2030", "portfolio", "investment",
+    "fund", "fonds", "holding", "hub", "campus", "ecosystem", "ecosystème",
+}
+GRAPH_COMPANY_HINTS = {
+    "biotech", "medtech", "healthtech", "oncology", "therapeutic", "therapeutics",
+    "medical", "diagnostic", "device", "imaging", "precision medicine",
+    "vaccine", "cell", "protein", "surgery", "surgical", "transplant", "immune",
+    "immuno", "clinical", "hospital", "pharma", "drug", "patient",
+}
+GRAPH_BAD_NAME_FRAGMENTS = {
+    "find a trial", "patient assistance", "patient support", "clinical trial",
+    "career", "jobs", "newsroom", "media center", "press room",
+}
+GRAPH_PERSON_ROLES = {
+    "founder", "co-founder", "ceo", "cbo", "board", "partner", "managing partner", "principal",
+}
 
 
 def _get(url: str, timeout: int = 12) -> requests.Response | None:
     try:
-        return requests.get(url, headers=HEADERS, timeout=timeout)
+        return requests.get(url, headers=HEADERS, timeout=timeout, verify=False)
     except Exception as e:
         log_error("scraper", e, url)
     return None
+
+
+def _fetch_page(url: str, timeout: int = 12) -> str:
+    resp = _get(url, timeout=timeout)
+    if resp and resp.ok:
+        return resp.text
+    return ""
+
+
+def _post_duckduckgo(query: str, timeout: int = 8) -> str:
+    try:
+        resp = requests.post(
+            "https://html.duckduckgo.com/html/",
+            data={"q": query},
+            headers=HEADERS,
+            timeout=timeout,
+        )
+        if resp.ok:
+            return resp.text
+    except Exception as e:
+        log_error("scraper", e, f"duckduckgo query {query}")
+    return ""
+
+
+def _clean_company_name(name: str) -> str:
+    text = re.sub(r"\s+", " ", (name or "").replace("**", "")).strip(" -|–—")
+    for sep in ("|", " – ", " — ", " - "):
+        if sep in text:
+            text = text.split(sep)[0].strip()
+    return text
+
+
+def _is_excluded_graph_domain(domain: str, current_domain: str = "") -> bool:
+    domain = extract_domain(domain) if domain.startswith("http") else domain.lower().strip()
+    if not domain or "." not in domain:
+        return True
+    if current_domain and domain == current_domain:
+        return True
+    return any(stop in domain for stop in GRAPH_STOP_DOMAINS)
+
+
+def _looks_like_target_company(name: str, domain: str, context: str = "") -> bool:
+    name = _clean_company_name(name)
+    haystack = f"{name} {domain} {context}".lower()
+    if len(name) < 3:
+        return False
+    if any(stop in haystack for stop in ("privacy", "cookie", "legal", "contact us", "join us", "newsroom")):
+        return False
+    if any(fragment in haystack for fragment in GRAPH_BAD_NAME_FRAGMENTS):
+        return False
+    return any(hint in haystack for hint in GRAPH_COMPANY_HINTS) or domain.endswith((".bio", ".health"))
+
+
+def _looks_like_org_node(name: str, domain: str, context: str = "") -> bool:
+    haystack = f"{name} {domain} {context}".lower()
+    return any(hint in haystack for hint in GRAPH_ORG_HINTS)
+
+
+def _domain_to_company_name(domain: str) -> str:
+    stem = extract_domain(domain) if domain.startswith("http") else domain
+    stem = stem.split(".")[0]
+    stem = re.sub(r"[-_]+", " ", stem)
+    return " ".join(part.capitalize() for part in stem.split())
+
+
+def _make_graph_lead(company_name: str, domain: str, relation_path: str, priority: str = "B", context: str = "") -> dict:
+    note_parts = [
+        "Graph expansion lead",
+        f"path: {relation_path}",
+        f"priority {priority}",
+    ]
+    if context:
+        note_parts.append(context[:220])
+    return {
+        "nom": "",
+        "prenom": "Fondateur",
+        "boite": _clean_company_name(company_name),
+        "domaine": extract_domain(domain) if domain.startswith("http") else domain,
+        "email": "",
+        "linkedin_url": "",
+        "statut": "Nouveau",
+        "notes": " | ".join(note_parts),
+        "premium": "True" if priority in {"A", "B"} else "",
+    }
+
+
+def _extract_relation_org_nodes(company_name: str, company_domain: str) -> list[dict]:
+    return _extract_relation_org_nodes_from_site(company_name, company_domain)
+
+
+def _extract_relation_org_nodes_from_site(company_name: str, company_domain: str) -> list[dict]:
+    nodes = []
+    seen = set()
+    for page in GRAPH_COMPANY_PAGE_PATHS:
+        for scheme in ("https", "http"):
+            html = _fetch_page(f"{scheme}://{company_domain}{page}")
+            if not html:
+                continue
+            soup = BeautifulSoup(html, "html.parser")
+            for a in soup.find_all("a", href=True):
+                href = a.get("href", "")
+                domain = extract_domain(href)
+                if _is_excluded_graph_domain(domain, company_domain):
+                    continue
+                text = a.get_text(" ", strip=True)
+                context = f"{text} {href}".strip()
+                if not _looks_like_org_node(text or domain, domain, context):
+                    continue
+                relation_type = "partner"
+                lower_context = context.lower()
+                if any(token in lower_context for token in ("portfolio", "investment", "investor", "fund", "venture", "capital")):
+                    relation_type = "investor"
+                elif any(token in lower_context for token in ("incubator", "accelerator", "satt", "campus")):
+                    relation_type = "incubator"
+                elif any(token in lower_context for token in ("france 2030", "bpifrance", "program", "programme")):
+                    relation_type = "program"
+                elif "spin" in lower_context:
+                    relation_type = "spinout"
+                key = (relation_type, domain)
+                if key in seen:
+                    continue
+                seen.add(key)
+                node_type = "program" if relation_type in {"program", "incubator"} else "org"
+                nodes.append({
+                    "node_type": node_type,
+                    "name": _clean_company_name(text) or _domain_to_company_name(domain),
+                    "domain": domain,
+                    "relation_type": relation_type,
+                    "url": href,
+                    "context": context,
+                    "path": f"{company_name} -> {relation_type} -> {text or domain}",
+                })
+                if len(nodes) >= 4:
+                    return nodes
+            if nodes:
+                return nodes
+    return nodes
+
+
+def _extract_external_company_links(org_domain: str, html: str) -> list[tuple[str, str, str]]:
+    soup = BeautifulSoup(html, "html.parser")
+    found = []
+    seen = set()
+    for a in soup.find_all("a", href=True):
+        href = a.get("href", "")
+        target_domain = extract_domain(href)
+        text = a.get_text(" ", strip=True)
+        if not target_domain or target_domain == org_domain or _is_excluded_graph_domain(target_domain):
+            continue
+        context = f"{text} {href}".strip()
+        name = _clean_company_name(text) or _domain_to_company_name(target_domain)
+        if not _looks_like_target_company(name, target_domain, context):
+            continue
+        key = (name.lower(), target_domain.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        found.append((name, target_domain, context))
+    return found
+
+
+def _expand_org_node_to_companies(node: dict) -> list[dict]:
+    domain = node["domain"]
+    path = node.get("path", node.get("name", domain))
+    priority = "A" if node["relation_type"] in {"investor", "program", "incubator", "spinout"} else "B"
+    leads = []
+    seen = set()
+
+    candidate_urls = [node.get("url", "")]
+    for page in GRAPH_ORG_PAGE_PATHS:
+        candidate_urls.append(f"https://{domain}{page}")
+        candidate_urls.append(f"http://{domain}{page}")
+
+    for url in candidate_urls[:7]:
+        if not url:
+            continue
+        html = _fetch_page(url)
+        if not html:
+            continue
+        for company_name, company_domain, context in _extract_external_company_links(domain, html):
+            key = (company_name.lower(), company_domain.lower())
+            if key in seen:
+                continue
+            seen.add(key)
+            leads.append(_make_graph_lead(
+                company_name,
+                company_domain,
+                relation_path=f"{path} -> {company_name}",
+                priority=priority,
+                context=context,
+            ))
+        if leads:
+            break
+    return leads
+
+
+def expand_biotech_graph(
+    seed_leads: list[dict],
+    max_new: int = 25,
+    hard_depth_cap: int = 4,
+    max_seed_companies: int = 15,
+    time_budget_seconds: int = 120,
+) -> list[dict]:
+    """
+    Explore l'écosystème biotech par propagation :
+    company -> org/program/person forte -> company -> ...
+    Stoppe par qualité et doublons, avec un garde-fou de profondeur.
+    """
+    discovered = []
+    start_time = time.monotonic()
+    seen_company_domains = {
+        extract_domain(lead.get("domaine", "") or "") or str(lead.get("domaine", "")).strip().lower()
+        for lead in seed_leads
+        if str(lead.get("domaine", "")).strip()
+    }
+    seen_company_names = {
+        str(lead.get("boite", "")).strip().lower()
+        for lead in seed_leads
+        if str(lead.get("boite", "")).strip()
+    }
+    seen_nodes = set()
+    queue = deque()
+
+    def _seed_rank(lead: dict) -> tuple[int, int, int]:
+        status = str(lead.get("statut", "")).strip().lower()
+        premium = str(lead.get("premium", "")).strip().lower() in {"true", "1", "yes"}
+        has_domain = int(bool(str(lead.get("domaine", "")).strip()))
+        active = 0 if status in {"bounce", "dnc", "hors scope"} else 1
+        return (1 if premium else 0, active, has_domain)
+
+    sorted_seeds = sorted(seed_leads, key=_seed_rank, reverse=True)
+
+    for lead in sorted_seeds[:max_seed_companies]:
+        company = str(lead.get("boite", "")).strip()
+        domain = str(lead.get("domaine", "")).strip().lower()
+        if company and domain:
+            queue.append({
+                "node_type": "company",
+                "name": company,
+                "domain": domain,
+                "depth": 0,
+                "path": company,
+            })
+
+    for org_node in ECOSYSTEM_ORG_SEEDS:
+        seeded = dict(org_node)
+        seeded["depth"] = 0
+        seeded["path"] = seeded["name"]
+        queue.append(seeded)
+
+    while queue and len(discovered) < max_new:
+        if time.monotonic() - start_time >= time_budget_seconds:
+            break
+        node = queue.popleft()
+        node_key = (node["node_type"], node["name"].lower(), node.get("domain", "").lower(), node.get("depth", 0))
+        if node_key in seen_nodes:
+            continue
+        seen_nodes.add(node_key)
+
+        if node["depth"] >= hard_depth_cap:
+            continue
+
+        if node["node_type"] == "company":
+            org_nodes = _extract_relation_org_nodes(node["name"], node.get("domain", ""))
+            for org_node in org_nodes:
+                org_node["depth"] = node["depth"] + 1
+                queue.append(org_node)
+            continue
+
+        if node["node_type"] in {"org", "program"}:
+            leads = _expand_org_node_to_companies(node)
+            for lead in leads:
+                company_name = str(lead.get("boite", "")).strip()
+                domain = str(lead.get("domaine", "")).strip().lower()
+                if not company_name or not domain:
+                    continue
+                if company_name.lower() in seen_company_names or domain in seen_company_domains:
+                    continue
+                seen_company_names.add(company_name.lower())
+                seen_company_domains.add(domain)
+                discovered.append(lead)
+                queue.append({
+                    "node_type": "company",
+                    "name": company_name,
+                    "domain": domain,
+                    "depth": node["depth"] + 1,
+                    "path": lead.get("notes", company_name),
+                })
+                if len(discovered) >= max_new:
+                    break
+
+    return discovered
 
 
 def load_curated_premium_leads(path: Path | None = None) -> list[dict]:
