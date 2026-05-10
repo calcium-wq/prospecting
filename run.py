@@ -37,18 +37,19 @@ from modules.leads_csv import (
 _GENERIC_EMAIL_PREFIXES = {
     "contact", "hello", "info", "bonjour", "contact-us", "admin",
     "support", "noreply", "no-reply", "sales", "marketing", "service",
-    "team", "equipe", "investor", "investors", "ir",
+    "team", "equipe", "investor", "investors", "ir", "scientific", "board",
 }
 _BAD_PRENOM_VALUES = {
     "fondateur", "founder", "contact", "support", "admin", "ceo",
     "directeur", "hello", "marketing", "sales", "service", "team",
-    "investor", "investors", "ir",
+    "investor", "investors", "ir", "scientific", "board",
 }
 
 
 def is_generic_email(email: str) -> bool:
     prefix = email.split("@")[0].lower()
-    return prefix in _GENERIC_EMAIL_PREFIXES
+    parts = [part for part in prefix.replace("-", ".").replace("_", ".").split(".") if part]
+    return prefix in _GENERIC_EMAIL_PREFIXES or any(part in _GENERIC_EMAIL_PREFIXES for part in parts)
 
 
 PRENOM_CORRECTIONS: dict[str, tuple[str, str]] = {
@@ -341,12 +342,19 @@ def _status_startswith(value, prefixes):
     return any(key.startswith(prefix) for prefix in prefixes)
 
 
+def _email_matches_domain(email, domain):
+    email = str(email or "").strip().lower()
+    domain = str(domain or "").strip().lower()
+    return bool(email and domain and email.endswith("@" + domain))
+
+
 def _get_contactable_new_leads(df):
     """Leads qui peuvent recevoir un premier email sans intervention humaine."""
-    blocked_prefixes = ("email envoy", "relanc", "interess", "int", "froid", "linkedin envoy", "dnc", "hors scope")
+    blocked_prefixes = ("email envoy", "relanc", "interess", "int", "froid", "linkedin envoy", "dnc", "hors scope", "bounce")
     return df[
         (df["contact_decision"] == "auto_send") &
         (df["email"] != "") &
+        (df["dnc"].fillna("").astype(str).str.strip().str.lower() != "true") &
         (~df["statut"].apply(lambda value: _status_startswith(value, blocked_prefixes)))
     ]
 
@@ -370,6 +378,31 @@ def step_scrape(max_leads: int = 9999) -> list[dict]:
         return []
 
 
+def step_import_premium():
+    """Importe les leads premium curates depuis NEW_LEADS_PIPELINE.md."""
+    from modules.scraper import load_curated_premium_leads
+
+    print("\n" + "=" * 60)
+    print("ETAPE 1B - IMPORT PREMIUM CURATE")
+    print("=" * 60)
+    try:
+        leads = load_curated_premium_leads()
+        if not leads:
+            print("[PremiumImport] Aucun lead premium a importer")
+            return []
+
+        added = 0
+        for lead in leads:
+            if add_lead(lead):
+                added += 1
+        print(f"[PremiumImport] {added}/{len(leads)} leads premium ajoutes")
+        return leads
+    except Exception as e:
+        log_error("run.py", e, "step_import_premium")
+        print(f"[PremiumImport] ERREUR : {e}")
+        return []
+
+
 def step_enrich():
     """Etape 2 : enrichissement emails."""
     from modules.email_enricher import enrich_lead, extract_prenom_from_email
@@ -381,30 +414,67 @@ def step_enrich():
         df = _rescore_all_leads(load_leads())
         save_leads(df)
 
-        to_enrich = df[df["email"] == ""]
+        to_enrich = df[
+            (~df["statut"].isin(["DNC", "Hors scope"])) &
+            (
+                (df["email"] == "") |
+                (df["contact_decision"] == "auto_hold") |
+                (~df.apply(lambda row: _email_matches_domain(row.get("email", ""), row.get("domaine", "")), axis=1))
+            )
+        ]
         if to_enrich.empty:
-            print("[Enricher] Aucun lead sans email")
+            print("[Enricher] Aucun lead a enrichir ou requalifier")
         else:
-            print(f"[Enricher] {len(to_enrich)} leads a enrichir...")
+            print(f"[Enricher] {len(to_enrich)} leads a enrichir/requalifier...")
             for idx, row in to_enrich.iterrows():
                 lead = row.to_dict()
                 try:
                     enriched = enrich_lead(lead)
-                    if enriched.get("email"):
-                        found_email = enriched["email"]
-                        current_prenom = row.get("prenom", "")
-                        placeholder = current_prenom.lower() in {"fondateur", "founder", "", "ceo", "directeur"}
-                        new_prenom = extract_prenom_from_email(found_email, current_prenom) if placeholder else current_prenom
+                    found_email = str(enriched.get("email", "")).strip()
+                    current_email = str(row.get("email", "")).strip()
+                    current_prenom = str(row.get("prenom", "")).strip()
+                    placeholder = current_prenom.lower() in {"fondateur", "founder", "", "ceo", "directeur"}
 
-                        df.loc[idx, "email"] = found_email
-                        if new_prenom and new_prenom != current_prenom:
-                            df.loc[idx, "prenom"] = new_prenom
-                            print(f"[Enricher] {row.get('boite', '')} -> {found_email} (prenom: {new_prenom})")
-                        else:
-                            print(f"[Enricher] {row.get('boite', '')} -> {found_email}")
+                    if found_email:
+                        chosen_prenom = str(enriched.get("prenom", "")).strip()
+                        if placeholder and not chosen_prenom:
+                            chosen_prenom = extract_prenom_from_email(found_email, current_prenom)
+
+                        for key in (
+                            "email",
+                            "prenom",
+                            "nom",
+                            "notes",
+                            "contact_role",
+                            "contact_origin",
+                            "proof_level",
+                            "premium",
+                            "domaine",
+                        ):
+                            value = enriched.get(key, "")
+                            if value != "":
+                                df.loc[idx, key] = value
+
+                        if chosen_prenom:
+                            df.loc[idx, "prenom"] = chosen_prenom
+
+                        contact_changed = bool(current_email and current_email != found_email)
+                        if contact_changed:
+                            for key in ("date_email", "relance_j3", "relance_j7", "relance_j14", "canal", "reponse", "dnc"):
+                                df.loc[idx, key] = ""
+                            df.loc[idx, "hold_attempts"] = ""
 
                         _rescore_row_in_df(df, idx, increment_hold=True)
-                        save_leads(df)
+                        action = "upgrade" if current_email and current_email != found_email else "select"
+                        print(
+                            f"[Enricher] {row.get('boite', '')} -> {found_email} "
+                            f"[{action} | {df.loc[idx, 'contact_decision']} | score {df.loc[idx, 'contact_score']}]"
+                        )
+                    else:
+                        _rescore_row_in_df(df, idx, increment_hold=True)
+                        print(f"[Enricher] {row.get('boite', '')} -> aucun contact fiable")
+
+                    save_leads(df)
                 except Exception as e:
                     log_error("run.py", e, f"enrich {row.get('domaine', '')}")
 
@@ -729,7 +799,7 @@ def step_followups():
 
 def step_followup_preview():
     """Aperçu des relances dues aujourd'hui sans envoyer."""
-    from modules.gmail_monitor import check_replies, process_replies
+    from modules.gmail_monitor import check_bounces, process_bounces, check_replies, process_replies
     from modules.followup import get_followups_due_today, validate_followup
     from modules.llm import generate_followup_j3, generate_followup_j7, generate_followup_j14
     from modules.leads_csv import load_leads
@@ -739,6 +809,10 @@ def step_followup_preview():
 
     print("\n[Gmail] Vérification des réponses...")
     try:
+        bounces = check_bounces()
+        if bounces:
+            print(f"[Gmail] {len(bounces)} bounce(s) détecté(s)")
+            process_bounces(bounces)
         replies = check_replies()
         if replies:
             print(f"[Gmail] {len(replies)} réponse(s) détectée(s)")
@@ -748,7 +822,8 @@ def step_followup_preview():
 
     df = load_leads()
     responded = set(df[df["reponse"].fillna("").astype(str).str.strip() != ""]["email"].dropna().values)
-    dnc = set(df[df["dnc"].fillna("").astype(str).str.strip().lower() == "true"]["email"].dropna().values)
+    dnc_mask = df["dnc"].fillna("").astype(str).str.strip().str.lower() == "true"
+    dnc = set(df[dnc_mask]["email"].dropna().values)
 
     due = get_followups_due_today()
     total_preview = 0
@@ -844,10 +919,11 @@ def _build_summary_stats() -> dict:
     )
     return {
         "sent": int((df["statut"] == "Email envoyé").sum()),
-        "replies": int(df["reponse"].fillna("").astype(str).str.strip().ne("").sum()),
+        "replies": int(df["reponse"].fillna("").astype(str).str.strip().isin(["positive", "négative", "negative"]).sum()),
         "followups_due": int(due_mask.sum()),
         "no_email": int((df["email"].fillna("") == "").sum()),
         "hot": int((df["statut"] == "Intéressé").sum()),
+        "bounces": int(df["reponse"].fillna("").astype(str).str.strip().str.lower().eq("bounce").sum()),
     }
 
 
@@ -868,15 +944,20 @@ def step_daily_summary():
 
 def step_monitor_replies():
     """Étape 6 : Vérification des réponses Gmail."""
-    from modules.gmail_monitor import check_replies, process_replies
+    from modules.gmail_monitor import check_bounces, process_bounces, check_replies, process_replies
     from modules.telegram_notif import notify_hot_lead
     print("\n" + "="*60)
     print("ÉTAPE 6 — SURVEILLANCE RÉPONSES GMAIL")
     print("="*60)
     try:
+        bounces = check_bounces()
+        if bounces:
+            print(f"[GmailMonitor] {len(bounces)} bounce(s) détecté(s)")
+            process_bounces(bounces)
         replies = check_replies()
         if not replies:
-            print("[GmailMonitor] Aucune nouvelle réponse détectée")
+            if not bounces:
+                print("[GmailMonitor] Aucune nouvelle réponse détectée")
         else:
             print(f"[GmailMonitor] {len(replies)} réponse(s) détectée(s)")
             process_replies(replies, notify_fn=notify_hot_lead)
@@ -1001,6 +1082,7 @@ def test_all_components():
 def main():
     parser = argparse.ArgumentParser(description="Pipeline de prospection B2B — Edgar Frinis")
     parser.add_argument("--scrape", action="store_true", help="Scraping startups uniquement")
+    parser.add_argument("--import-premium", action="store_true", help="Importe les leads premium curates depuis NEW_LEADS_PIPELINE.md")
     parser.add_argument("--enrich", action="store_true", help="Enrichissement emails uniquement")
     parser.add_argument("--preview", action="store_true", help="Génère et affiche les emails pour validation")
     parser.add_argument("--send", action="store_true", help="Envoi emails (après --preview ou seul)")
@@ -1027,6 +1109,8 @@ def main():
 
     if args.scrape:
         step_scrape(args.max_leads)
+    elif args.import_premium:
+        step_import_premium()
     elif args.enrich:
         step_enrich()
     elif args.preview:

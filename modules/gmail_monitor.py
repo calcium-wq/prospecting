@@ -6,10 +6,21 @@ import email
 from email.header import decode_header
 from datetime import datetime, date, timedelta
 from modules.config import GMAIL_ADDRESS, GMAIL_APP_PASSWORD, NEGATIVE_KEYWORDS
-from modules.leads_csv import update_lead, load_leads
+from modules.leads_csv import update_lead, load_leads, save_leads
 from modules.logger import log_error
 
 IMAP_HOST = "imap.gmail.com"
+BOUNCE_SENDER_MARKERS = ("mail delivery subsystem", "mailer-daemon", "postmaster")
+BOUNCE_SUBJECT_MARKERS = (
+    "delivery status notification",
+    "adresse introuvable",
+    "message non distribué",
+    "message non distribue",
+    "address not found",
+    "undeliver",
+    "delivery incomplete",
+    "delivery failure",
+)
 
 def _decode_str(s) -> str:
     if isinstance(s, bytes):
@@ -36,6 +47,96 @@ def _get_body(msg) -> str:
 def _is_negative(body: str) -> bool:
     body_lower = body.lower()
     return any(kw in body_lower for kw in NEGATIVE_KEYWORDS)
+
+
+def _append_note(email_addr: str, note: str):
+    try:
+        df = load_leads()
+        mask = df["email"].fillna("").astype(str).str.strip().str.lower() == str(email_addr or "").strip().lower()
+        if not mask.any():
+            return
+        existing = str(df.loc[mask, "notes"].iloc[0] or "").strip()
+        parts = [part.strip() for part in existing.split(" | ") if part.strip()]
+        if note not in parts:
+            parts.append(note)
+        df.loc[mask, "notes"] = " | ".join(parts)
+        save_leads(df)
+    except Exception as e:
+        log_error("gmail_monitor", e, f"append_note {email_addr}")
+
+
+def _extract_known_emails(text: str, known_emails: set[str]) -> list[str]:
+    lowered = (text or "").lower()
+    matches = []
+    for email_addr in known_emails:
+        if email_addr and email_addr.lower() in lowered:
+            matches.append(email_addr)
+    return matches
+
+
+def _looks_like_bounce(from_header: str, subject: str, body: str) -> bool:
+    haystack = " ".join([from_header or "", subject or "", body or ""]).lower()
+    return any(marker in haystack for marker in BOUNCE_SENDER_MARKERS + BOUNCE_SUBJECT_MARKERS)
+
+
+def check_bounces(days: int = 7) -> list[dict]:
+    """
+    Scan Gmail for delivery failures affecting known prospect emails.
+    Returns list of {email, subject, body} dicts.
+    """
+    bounces = []
+    try:
+        mail = imaplib.IMAP4_SSL(IMAP_HOST)
+        mail.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
+        mail.select("INBOX")
+
+        since = (date.today() - timedelta(days=days)).strftime("%d-%b-%Y")
+        _, data = mail.search(None, f'(SINCE {since})')
+        if not data[0]:
+            mail.logout()
+            return []
+
+        df = load_leads()
+        known_emails = {
+            str(value).strip().lower()
+            for value in df["email"].dropna().values
+            if str(value).strip()
+        }
+        already_bounced = {
+            str(value).strip().lower()
+            for value in df[df["statut"].fillna("").astype(str).str.strip().str.lower() == "bounce"]["email"].dropna().values
+            if str(value).strip()
+        }
+        seen = set()
+
+        for num in data[0].split():
+            try:
+                _, msg_data = mail.fetch(num, "(RFC822)")
+                msg = email.message_from_bytes(msg_data[0][1])
+                from_header = _decode_str(msg.get("From", ""))
+                subject = _decode_str(msg.get("Subject", ""))
+                body = _get_body(msg)
+                if not _looks_like_bounce(from_header, subject, body):
+                    continue
+
+                matched_emails = _extract_known_emails(" ".join([from_header, subject, body]), known_emails)
+                for matched in matched_emails:
+                    if matched in already_bounced or matched in seen:
+                        continue
+                    seen.add(matched)
+                    bounces.append({
+                        "email": matched,
+                        "subject": subject,
+                        "body": body[:1000],
+                    })
+            except Exception as e:
+                log_error("gmail_monitor", e, "parse bounce message")
+
+        mail.logout()
+    except Exception as e:
+        log_error("gmail_monitor", e, "check_bounces")
+
+    return bounces
 
 def check_replies() -> list[dict]:
     """
@@ -136,3 +237,19 @@ def process_replies(replies: list[dict], notify_fn=None):
                         notify_fn(prenom, boite, email_addr)
                 except Exception as e:
                     log_error("gmail_monitor", e, f"notify {email_addr}")
+
+
+def process_bounces(bounces: list[dict]):
+    """Marque automatiquement les emails en échec de livraison."""
+    from modules.notion_crm import update_status, log_action
+
+    for bounce in bounces:
+        email_addr = bounce["email"]
+        print(f"[GmailMonitor] Bounce détecté pour {email_addr}")
+        update_lead(email_addr, {"dnc": "true", "statut": "Bounce", "reponse": "bounce", "contact_decision": "dnc"})
+        _append_note(email_addr, "Bounce detected from Gmail delivery failure")
+        try:
+            update_status(email_addr, "DNC")
+            log_action(email_addr, "Bounce détecté", bounce.get("subject", ""))
+        except Exception as e:
+            log_error("gmail_monitor", e, f"notion bounce {email_addr}")

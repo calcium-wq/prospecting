@@ -54,6 +54,7 @@ SENT_STATUS_PREFIXES = (
     "int",
     "froid",
     "linkedin envoy",
+    "bounce",
 )
 
 

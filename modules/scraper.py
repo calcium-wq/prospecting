@@ -9,9 +9,11 @@ Sources (dans l'ordre de priorité) :
 """
 import re
 import time
+from pathlib import Path
+
 import requests
 from bs4 import BeautifulSoup
-from modules.config import TARGET_SECTOR
+from modules.config import TARGET_SECTOR, BASE_DIR
 from modules.logger import log_error
 
 HEADERS = {
@@ -80,13 +82,83 @@ STATIC_LEADS = [
     ("Creapharm", "creapharm.com", "biotech", "series_a"),
 ]
 
+CURATED_PREMIUM_PIPELINE = BASE_DIR / "NEW_LEADS_PIPELINE.md"
+
 
 def _get(url: str, timeout: int = 12) -> requests.Response | None:
     try:
         return requests.get(url, headers=HEADERS, timeout=timeout)
     except Exception as e:
         log_error("scraper", e, url)
-        return None
+    return None
+
+
+def load_curated_premium_leads(path: Path | None = None) -> list[dict]:
+    """Charge les leads premium curatés depuis NEW_LEADS_PIPELINE.md."""
+    target = path or CURATED_PREMIUM_PIPELINE
+    if not target.exists():
+        return []
+
+    text = target.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    leads = []
+    seen = set()
+    current_header: list[str] | None = None
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            current_header = None if stripped.startswith("## ") else current_header
+            continue
+
+        parts = [part.strip() for part in stripped.strip("|").split("|")]
+        if not parts or set(parts) == {"---"}:
+            continue
+
+        lowered = [part.lower() for part in parts]
+        if "entreprise" in lowered and "domaine" in lowered and ("priorité" in lowered or "priorite" in lowered):
+            current_header = lowered
+            continue
+
+        if not current_header or parts[0] == "#":
+            continue
+
+        row = dict(zip(current_header, parts))
+        company = row.get("entreprise", "").replace("**", "").strip()
+        domain = row.get("domaine", "").strip()
+        why_fit = row.get("why 3d fit", row.get("why 3d fit ", "")).strip()
+        priority = row.get("priorité", row.get("priorite", "")).strip().upper()
+        angle = row.get("angle email", "").strip()
+
+        domain = domain.lower()
+        if not company or company.upper() == "TBD" or domain in {"", "-"}:
+            continue
+        if " " in domain or "." not in domain or not re.fullmatch(r"[a-z0-9.-]+\.[a-z]{2,}", domain):
+            continue
+
+        key = (company.lower(), domain.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+
+        note_parts = [f"Imported from curated premium pipeline", f"priority {priority}"]
+        if why_fit:
+            note_parts.append(why_fit)
+        if angle:
+            note_parts.append(f"angle: {angle}")
+
+        leads.append({
+            "nom": "",
+            "prenom": "Fondateur",
+            "boite": company,
+            "domaine": domain,
+            "email": "",
+            "linkedin_url": "",
+            "statut": "Nouveau",
+            "notes": " | ".join(note_parts),
+            "premium": "True" if priority in {"A", "B"} else "",
+        })
+    return leads
 
 
 def extract_domain(url: str) -> str:

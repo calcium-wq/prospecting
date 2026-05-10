@@ -38,6 +38,10 @@ def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df[COLUMNS].fillna("")
 
 
+def _norm_text(value: str) -> str:
+    return str(value or "").strip().lower()
+
+
 def _load_csv_rows() -> pd.DataFrame:
     with open(LEADS_CSV, newline="", encoding="utf-8") as handle:
         reader = csv.reader(handle)
@@ -72,10 +76,32 @@ def save_leads(df: pd.DataFrame):
     _ensure_columns(df).to_csv(LEADS_CSV, index=False)
 
 
-def is_duplicate(df: pd.DataFrame, email: str = "", linkedin_url: str = "") -> bool:
-    if email and email in df["email"].values:
+def is_duplicate(df: pd.DataFrame, email: str = "", linkedin_url: str = "", domaine: str = "", boite: str = "") -> bool:
+    email = _norm_text(email)
+    linkedin_url = _norm_text(linkedin_url)
+    domaine = _norm_text(domaine)
+    boite = _norm_text(boite)
+
+    if email and email in df["email"].fillna("").astype(str).str.strip().str.lower().values:
         return True
-    if linkedin_url and linkedin_url in df["linkedin_url"].values:
+    if linkedin_url and linkedin_url in df["linkedin_url"].fillna("").astype(str).str.strip().str.lower().values:
+        return True
+    if domaine:
+        domain_mask = df["domaine"].fillna("").astype(str).str.strip().str.lower() == domaine
+        if domain_mask.any():
+            return True
+    if boite and domaine:
+        both_mask = (
+            (df["boite"].fillna("").astype(str).str.strip().str.lower() == boite) &
+            (df["domaine"].fillna("").astype(str).str.strip().str.lower() == domaine)
+        )
+        if both_mask.any():
+            return True
+    if boite:
+        company_mask = df["boite"].fillna("").astype(str).str.strip().str.lower() == boite
+        if company_mask.any():
+            return True
+    if domaine and domaine in df["domaine"].fillna("").astype(str).str.strip().str.lower().values:
         return True
     return False
 
@@ -84,7 +110,13 @@ def add_lead(row: dict) -> bool:
     """Add a new lead. Returns False if duplicate."""
     try:
         df = load_leads()
-        if is_duplicate(df, row.get("email", ""), row.get("linkedin_url", "")):
+        if is_duplicate(
+            df,
+            row.get("email", ""),
+            row.get("linkedin_url", ""),
+            row.get("domaine", ""),
+            row.get("boite", ""),
+        ):
             return False
         row.setdefault("statut", "Nouveau")
         row.setdefault("dnc", "")

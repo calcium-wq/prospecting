@@ -38,6 +38,7 @@ def send_daily_summary(stats: dict) -> bool:
         f"✉️ Emails envoyés : {stats.get('sent', 0)}\n"
         f"📬 Réponses reçues : {stats.get('replies', 0)}\n"
         f"🔄 Relances dues aujourd'hui : {stats.get('followups_due', 0)}\n"
+        f"↩️ Bounces détectés : {stats.get('bounces', 0)}\n"
         f"❌ Sans email : {stats.get('no_email', 0)}\n"
         f"🔥 Leads chauds : {stats.get('hot', 0)}"
     )

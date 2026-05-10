@@ -7,7 +7,7 @@ from modules.email_sender import _send_smtp
 from modules.llm import generate_followup_j3, generate_followup_j7, generate_followup_j14
 from modules.logger import log_error
 from modules.notion_crm import log_action
-from modules.gmail_monitor import check_replies, process_replies
+from modules.gmail_monitor import check_bounces, process_bounces, check_replies, process_replies
 from datetime import date
 
 SAFE_AUTOMATIC_FOLLOWUPS = True
@@ -171,6 +171,10 @@ def run_followups():
     """Run all pending follow-ups for today."""
     print("[Followup] Vérification des réponses Gmail...")
     try:
+        bounces = check_bounces()
+        if bounces:
+            print(f"[Followup] {len(bounces)} bounce(s) traité(s)")
+            process_bounces(bounces)
         replies = check_replies()
         if replies:
             print(f"[Followup] {len(replies)} réponse(s) traitée(s)")
@@ -180,7 +184,8 @@ def run_followups():
 
     df = load_leads()
     responded_emails = set(df[df["reponse"].fillna("").astype(str).str.strip() != ""]["email"].dropna().values)
-    dnc_emails = set(df[df["dnc"].fillna("").astype(str).str.strip().lower() == "true"]["email"].dropna().values)
+    dnc_mask = df["dnc"].fillna("").astype(str).str.strip().str.lower() == "true"
+    dnc_emails = set(df[dnc_mask]["email"].dropna().values)
 
     total_sent = 0
     for day in [3, 7, 14]:
